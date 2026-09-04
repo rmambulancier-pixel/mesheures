@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d1117">
+<title>MesHeures</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon.svg">
+<style>
+:root{--bg:#0d1117;--card:#161b22;--line:#30363d;--txt:#e6edf3;--dim:#8b949e;--ok:#3fb950;--warn:#d29922;--bad:#f85149;--acc:#238636}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.45 system-ui,-apple-system,sans-serif;padding-bottom:80px}
+header{position:sticky;top:0;z-index:20;background:#0d1117ee;backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:10px 12px}
+h1{font-size:17px;margin:0}
+.tabs{display:flex;gap:6px;margin-top:9px;overflow-x:auto}
+.tabs button{flex:1;min-width:78px;background:#21262d;border:1px solid var(--line);color:var(--dim);border-radius:8px;padding:8px 4px;font-size:13px;font-weight:600}
+.tabs button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+main{padding:12px;max-width:820px;margin:0 auto}
+section{display:none}section.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:11px}
+h2{font-size:15px;margin:0 0 10px;color:var(--ok)}
+label{display:block;font-size:11px;color:var(--dim);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px}
+input,select,textarea{background:#0d1117;border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:9px;font-size:15px;width:100%;font-family:inherit}
+input[type=checkbox]{width:20px;height:20px;vertical-align:-4px}
+.grid{display:grid;gap:9px;grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.g2{display:grid;gap:9px;grid-template-columns:1fr 1fr}
+button{background:var(--acc);color:#fff;border:0;border-radius:9px;padding:10px 13px;font-size:14px;font-weight:600;cursor:pointer}
+button.g{background:#21262d;border:1px solid var(--line);color:var(--txt)}
+button.r{background:#3d1a1c;border:1px solid #6e2427;color:#ff9b96}
+.row{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.nav{display:flex;gap:8px;align-items:center;margin-bottom:11px}
+.nav button{padding:10px 15px;font-size:17px}
+.nav .lbl{flex:1;text-align:center;font-weight:700;font-size:15px}
+.chips{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:11px}
+.chips button{flex:1;min-width:56px;padding:9px 3px;font-size:12px;background:#21262d;border:1px solid var(--line);color:var(--dim)}
+.chips button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:6px 3px;text-align:left;border-bottom:1px solid var(--line)}
+th{color:var(--dim);font-size:10px;text-transform:uppercase;font-weight:600}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.q{background:#0f2d1a}tr.q td{color:var(--ok);font-weight:700}
+tr.t{background:#1c2128}tr.t td{font-weight:700}
+.kpis{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(88px,1fr))}
+.kpi{background:#0d1117;border:1px solid var(--line);border-radius:9px;padding:9px 5px;text-align:center}
+.kpi b{display:block;font-size:17px;color:var(--ok);font-variant-numeric:tabular-nums}
+.kpi span{font-size:10px;color:var(--dim)}
+.al{padding:8px 10px;border-radius:7px;margin-bottom:6px;font-size:13px}
+.al.w{background:#2d2411;border-left:3px solid var(--warn)}
+.al.b{background:#2d1516;border-left:3px solid var(--bad)}
+.al.i{background:#11202d;border-left:3px solid #58a6ff}
+.al.k{background:#0f2d1a;border-left:3px solid var(--ok)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr) 46px;gap:3px}
+.cal .h{font-size:10px;color:var(--dim);text-align:center;padding:3px 0}
+.cel{background:#0d1117;border:1px solid var(--line);border-radius:7px;padding:4px 2px;min-height:52px;text-align:center;cursor:pointer}
+.cel .d{font-size:11px;color:var(--dim)}
+.cel .v{font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.cel.T{background:#0f2d1a;border-color:#1d5c33}.cel.T .v{color:var(--ok)}
+.cel.RC{background:#1a1f4d;border-color:#33409e}.cel.RC .v{color:#8b9bff}
+.cel.CP{background:#3d3312;border-color:#7a6620}.cel.CP .v{color:var(--warn)}
+.cel.MAL{background:#3d1a1c;border-color:#6e2427}.cel.MAL .v{color:#ff9b96}
+.cel.off{opacity:.32}.cel.now{outline:2px solid var(--ok)}
+.rec{background:#1c2128;border:1px solid var(--line);border-radius:7px;font-size:10px;padding:4px 1px;text-align:center;color:var(--dim);line-height:1.25}
+.rec b{display:block;color:var(--ok);font-size:11px}
+.pz{background:#0d1117;border:1px solid var(--line);border-radius:9px;padding:9px;margin-bottom:7px}
+.bar{height:7px;background:#21262d;border-radius:4px;overflow:hidden;margin:7px 0}
+.bar i{display:block;height:100%;background:var(--ok)}
+.mut{color:var(--dim);font-size:12px}
+.fab{position:fixed;bottom:0;left:0;right:0;background:#0d1117ee;backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:9px 12px;display:flex;gap:8px;z-index:30}
+.fab button{flex:1}
+@media print{.tabs,.fab,header,button{display:none}section{display:block!important}body{background:#fff;color:#000}}
+</style>
+</head>
+<body>
+<header>
+<h1>🚑 MesHeures</h1>
+<div class="tabs">
+<button id="t-jour" class="on" onclick="tab('jour')">Jour</button>
+<button id="t-mois" onclick="tab('mois')">Mois</button>
+<button id="t-paie" onclick="tab('paie')">Paie</button>
+<button id="t-reg" onclick="tab('reg')">Réglages</button>
+</div>
+</header>
+<main>
+
+<section id="s-jour" class="on">
+  <div class="nav">
+    <button class="g" onclick="goDay(-1)">‹</button>
+    <div class="lbl" id="dLbl"></div>
+    <button class="g" onclick="goDay(1)">›</button>
+  </div>
+  <div class="card">
+    <div class="chips" id="dType"></div>
+    <div id="dWork"></div>
+    <div style="margin-top:9px"><label>Note</label><input id="dNote" onchange="setD('note',this.value)"></div>
+  </div>
+  <div class="card"><h2>Résumé du jour</h2><div class="kpis" id="dKpi"></div><div id="dAl" style="margin-top:10px"></div></div>
+  <div class="card"><h2>Quatorzaine en cours</h2><div id="dQuat"></div></div>
+  <div class="fab">
+    <button class="g" onclick="curDate=today();renderDay()">Aujourd'hui</button>
+    <button class="g" onclick="dupli()">Copier la veille</button>
+  </div>
+</section>
+
+<section id="s-mois">
+  <div class="nav">
+    <button class="g" onclick="goMonth(-1)">‹</button>
+    <div class="lbl" id="mLbl"></div>
+    <button class="g" onclick="goMonth(1)">›</button>
+  </div>
+  <div class="card"><div class="cal" id="mCal"></div>
+  <div class="mut" style="margin-top:9px">Touche un jour pour le modifier · la colonne de droite affiche amplitude / TTE par semaine</div></div>
+  <div class="card"><h2>Total du mois affiché</h2><div class="kpis" id="mKpi"></div></div>
+</section>
+
+<section id="s-paie">
+  <div class="nav">
+    <button class="g" onclick="goPer(-1)">‹</button>
+    <div class="lbl" id="pLbl"></div>
+    <button class="g" onclick="goPer(1)">›</button>
+  </div>
+  <div class="card">
+    <div class="g2">
+      <div><label>Début de période</label><input type="date" id="pS" onchange="DB.per.start=this.value;save();renderPay()"></div>
+      <div><label>Nb de quatorzaines</label><input type="number" min="1" max="6" id="pN" onchange="DB.per.nb=+this.value;save();renderPay()"></div>
+    </div>
+    <div id="pAlign" style="margin-top:9px"></div>
+  </div>
+  <div class="card"><h2>Synthèse</h2><div class="kpis" id="pKpi"></div>
+    <table id="pTab" style="margin-top:13px"></table></div>
+  <div class="card"><h2>⚠️ Contrôles de conformité</h2><div id="pAl"></div></div>
+  <div class="card"><h2>💶 Brut recalculé</h2><table id="pBrut"></table></div>
+  <div class="card"><h2>🔄 HS payées vs converties en RC</h2>
+    <div class="grid">
+      <div><label>HS 25 % payées (h)</label><input type="number" step="0.01" id="pP25" onchange="DB.per.p25=+this.value;save();renderPay()"></div>
+      <div><label>HS 50 % payées (h)</label><input type="number" step="0.01" id="pP50" onchange="DB.per.p50=+this.value;save();renderPay()"></div>
+      <div><label>Solde RC antérieur (h)</label><input type="number" step="0.01" id="pRC" onchange="DB.per.rcOld=+this.value;save();renderPay()"></div>
+    </div>
+    <div id="pRcOut" style="margin-top:11px"></div></div>
+  <div class="card"><h2>🔍 Comparaison fiche employeur</h2>
+    <div class="mut" style="margin-bottom:9px">Saisis le TTE de chaque semaine tel qu'il figure sur ta fiche.</div>
+    <table id="pCmp"></table></div>
+  <div class="fab">
+    <button class="g" onclick="copySum()">📋 Copier le résumé</button>
+    <button class="g" onclick="window.print()">🖨️ PDF</button>
+  </div>
+</section>
+
+<section id="s-reg">
+  <div class="card"><h2>Mon poste</h2><div class="grid" id="rg1"></div></div>
+  <div class="card"><h2>Heures &amp; quatorzaine</h2><div class="grid" id="rg2"></div>
+    <div style="margin-top:9px"><label><input type="checkbox" id="rMin" onchange="DB.s.min=this.checked;save();renderAll()"> Appliquer le TTE minimum de 4h30</label></div></div>
+  <div class="card"><h2>Indemnités</h2><div class="grid" id="rg3"></div></div>
+  <div class="card"><h2>💾 Sauvegarde</h2>
+    <div id="rBk" class="mut" style="margin-bottom:10px"></div>
+    <div class="row">
+      <button onclick="expo()">Exporter</button>
+      <button class="g" onclick="document.getElementById('fi').click()">Importer</button>
+      <button class="r" onclick="wipe()">Tout effacer</button>
+    </div>
+    <input type="file" id="fi" accept=".json" style="display:none" onchange="impo(this)">
+    <div class="mut" style="margin-top:10px">Tes données sont stockées <b>uniquement sur ce téléphone</b>. Exporte une fois par mois : le fichier JSON est ta seule sauvegarde.</div></div>
+  <div class="card"><h2>Démarrage</h2>
+    <button class="g" onclick="demo()">Charger la période d'août 2026 (exemple)</button></div>
+</section>
+</main>
+
+<script>
+const LS='mesheures_v1';
+const DEF={taux:14.02,net:0.787,hab:10,habT:12.9688,idaj:12,base:35,pl:16,ir:15.70,iru:9.69,rc:420,cp:420,anc:0,min:false,maxAmp:14,anchor:'2026-06-01'};
+let DB={s:{...DEF},days:{},cmp:{},per:{start:'2026-07-27',nb:2,p25:15,p50:0,rcOld:104.52},exp:null};
+let curDate,curMonth,curTab='jour';
+
+const $=i=>document.getElementById(i);
+const pad=n=>String(n).padStart(2,'0');
+const isoOf=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const today=()=>isoOf(new Date());
+const dOf=s=>new Date(s+'T12:00:00');
+const addD=(s,n)=>{const d=dOf(s);d.setDate(d.getDate()+n);return isoOf(d)};
+const DOW=['dim','lun','mar','mer','jeu','ven','sam'];
+const MON=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+const dow=s=>DOW[dOf(s).getDay()];
+const mono=s=>{const d=dOf(s);d.setDate(d.getDate()-((d.getDay()+6)%7));return isoOf(d)};
+const P=s=>{if(!s||!/^\d{1,2}:\d{2}/.test(s))return null;const[h,m]=s.split(':').map(Number);return h*60+m};
+const F=m=>{if(m==null)return'—';const g=m<0;m=Math.abs(Math.round(m));return(g?'-':'')+Math.floor(m/60)+'h'+pad(m%60)};
+const C2=m=>(m/60).toFixed(2);
+const EUR=n=>n.toFixed(2).replace('.',',')+' €';
+const short=s=>s.slice(8)+'/'+s.slice(5,7);
+
+function save(){try{localStorage.setItem(LS,JSON.stringify(DB))}catch(e){alert('Sauvegarde impossible : '+e.message)}}
+function load(){try{const r=JSON.parse(localStorage.getItem(LS));if(r){DB={...DB,...r};DB.s={...DEF,...(r.s||{})};DB.per={...DB.per,...(r.per||{})}}}catch(e){}}
+function gd(k){if(!DB.days[k])DB.days[k]={t:'REPOS',p:[]};if(!DB.days[k].p)DB.days[k].p=[];return DB.days[k]}
+
+function cd(k){
+  const d=DB.days[k],S=DB.s;
+  const r={amp:0,tte:0,seuil:0,idaj:0,ir:0,iru:0,rc:0,fer:0,trav:0,pz:0,al:[],deb:null,fin:null,t:d?d.t:null};
+  if(!d)return r;
+  if(d.t==='T'){
+    const a=P(d.deb),b0=P(d.fin);
+    if(a==null||b0==null){r.al.push({lvl:'b',m:'horaires incomplets'});return r}
+    const b=b0<=a?b0+1440:b0,br=b-a;
+    (d.p||[]).forEach(p=>{const x=P(p.d);let y=P(p.f);
+      if(x!=null&&y!=null){if(y<x)y+=1440;r.pz+=y-x}
+      if(p.r){if(p.ty==='EXT')r.ir++;else r.iru++}});
+    r.amp=br+S.hab; r.tte=br-r.pz;
+    if(S.min&&r.tte<270)r.tte=270;
+    r.seuil=r.tte; r.trav=1; r.deb=a; r.fin=b;
+    r.idaj=Math.max(0,r.amp-S.idaj*60);
+    if(d.fer)r.fer=r.tte;
+    if(r.amp>S.maxAmp*60)r.al.push({lvl:'b',m:'amplitude '+F(r.amp)+' > '+S.maxAmp+'h'});
+    if(r.pz===0&&r.tte>=360)r.al.push({lvl:'w',m:'≥ 6h sans pause → 20 min dues (art. L3121-16)'});
+  }
+  else if(d.t==='CP')r.seuil=DB.s.cp;
+  else if(d.t==='RC')r.rc=DB.s.rc;
+  else if(d.deb||d.fin)r.al.push({lvl:'b',m:'jour « '+d.t+' » mais horaires saisis'});
+  return r;
+}
+
+function calcPer(start,nb){
+  const S=DB.s,Q=[],AL=[];let pk=null,pe=null;
+  const G={amp:0,tte:0,seuil:0,trav:0,idaj:0,ir:0,iru:0,rc:0,fer:0,nor:0,h25:0,h50:0,hab:0};
+  for(let q=0;q<nb;q++){
+    const o={start:addD(start,q*14),w:[],amp:0,tte:0,seuil:0,trav:0};
+    for(let w=0;w<2;w++){
+      const s={start:addD(start,q*14+w*7),amp:0,tte:0,trav:0};
+      for(let i=0;i<7;i++){
+        const k=addD(start,q*14+w*7+i),r=cd(k);
+        s.amp+=r.amp;s.tte+=r.tte;s.trav+=r.trav;o.seuil+=r.seuil;
+        G.idaj+=r.idaj;G.ir+=r.ir;G.iru+=r.iru;G.rc+=r.rc;G.fer+=r.fer;
+        r.al.forEach(a=>AL.push({k,...a}));
+        if(r.deb!=null){
+          if(pe!=null&&pk){const gap=Math.round((dOf(k)-dOf(pk))/60000)+r.deb-pe;
+            if(gap>0&&gap<660)AL.push({k,lvl:'w',m:'repos quotidien de '+F(gap)+' seulement (11h requises)'})}
+          pk=k;pe=r.fin;
+        }
+      }
+      if(s.tte>2880)AL.push({k:s.start,lvl:'b',m:'semaine à '+F(s.tte)+' — plafond 48h dépassé'});
+      o.w.push(s);o.amp+=s.amp;o.tte+=s.tte;o.trav+=s.trav;
+    }
+    const N=S.base*120;
+    o.nor=Math.min(o.seuil,N);
+    o.h25=Math.min(Math.max(o.seuil-N,0),S.pl*60);
+    o.h50=Math.max(o.seuil-N-S.pl*60,0);
+    ['amp','tte','seuil','trav','nor','h25','h50'].forEach(x=>G[x]+=o[x]);
+    Q.push(o);
+  }
+  G.hab=G.trav*S.hab;
+  return {Q,AL,G};
+}
+
+function brutOf(G){
+  const S=DB.s,T=S.taux,L=[];
+  L.push(['Heures normales',F(G.nor),T.toFixed(2)+' €/h',G.nor/60*T]);
+  if(G.h25)L.push(['HS 25 %',F(G.h25),(T*1.25).toFixed(2)+' €/h',G.h25/60*T*1.25]);
+  if(G.h50)L.push(['HS 50 %',F(G.h50),(T*1.5).toFixed(2)+' €/h',G.h50/60*T*1.5]);
+  if(G.fer)L.push(['Majoration férié 100 %',F(G.fer),T.toFixed(2)+' €/h',G.fer/60*T]);
+  if(G.rc)L.push(['Repos compensateur',F(G.rc),T.toFixed(2)+' €/h',G.rc/60*T]);
+  if(G.hab)L.push(['Habillage / déshabillage',C2(G.hab)+' h',S.habT.toFixed(4)+' €/h',G.hab/60*S.habT]);
+  if(G.idaj)L.push(['IDAJ',C2(G.idaj),T.toFixed(2)+' €/h',G.idaj/60*T]);
+  const sub=L.reduce((a,x)=>a+x[3],0);
+  if(S.anc)L.push(["Prime d'ancienneté",S.anc+' %','sur '+EUR(sub),sub*S.anc/100]);
+  const tot=L.reduce((a,x)=>a+x[3],0),pan=G.ir*S.ir+G.iru*S.iru;
+  return {L,tot,pan};
+}
+
+function tab(t){curTab=t;['jour','mois','paie','reg'].forEach(x=>{
+  $('s-'+x).classList.toggle('on',x===t);$('t-'+x).classList.toggle('on',x===t)});
+  window.scrollTo(0,0);renderAll()}
+
+function goDay(n){curDate=addD(curDate,n);renderDay()}
+function setD(f,v){const d=gd(curDate);d[f]=v;save();renderDay()}
+function setP(i,f,v){const d=gd(curDate);if(!d.p[i])d.p[i]={ty:'ENT',r:true};d.p[i][f]=v;save();renderDay()}
+function addP(){gd(curDate).p.push({d:'',f:'',ty:'ENT',r:true});save();renderDay()}
+function delP(i){gd(curDate).p.splice(i,1);save();renderDay()}
+function dupli(){const y=DB.days[addD(curDate,-1)];if(!y)return alert('Rien la veille');
+  DB.days[curDate]=JSON.parse(JSON.stringify(y));save();renderDay()}
+
+function renderDay(){
+  const k=curDate,d=gd(k),r=cd(k);
+  $('dLbl').textContent=dow(k).toUpperCase()+' '+k.slice(8)+' '+MON[+k.slice(5,7)-1]+(k===today()?' • aujourd\'hui':'');
+  $('dType').innerHTML=['T','REPOS','RC','CP','MAL'].map(x=>
+    `<button class="${d.t===x?'on':''}" onclick="setD('t','${x}')">${{T:'Travail',REPOS:'Repos',RC:'RC',CP:'Congé',MAL:'Maladie'}[x]}</button>`).join('');
+  let h='';
+  if(d.t==='T'){
+    h=`<div class="g2"><div><label>Début</label><input type="time" value="${d.deb||''}" onchange="setD('deb',this.value)"></div>
+    <div><label>Fin</label><input type="time" value="${d.fin||''}" onchange="setD('fin',this.value)"></div></div>
+    <div style="margin-top:11px"><label>Pauses</label>`;
+    d.p.forEach((p,i)=>h+=`<div class="pz"><div class="row">
+      <input type="time" value="${p.d||''}" onchange="setP(${i},'d',this.value)" style="flex:1">
+      <input type="time" value="${p.f||''}" onchange="setP(${i},'f',this.value)" style="flex:1">
+      <button class="r" onclick="delP(${i})" style="padding:8px 11px">✕</button></div>
+      <div class="row" style="margin-top:7px">
+      <select onchange="setP(${i},'ty',this.value)" style="flex:1"><option value="ENT"${p.ty==='ENT'?' selected':''}>Intérieur (IRU)</option><option value="EXT"${p.ty==='EXT'?' selected':''}>Extérieur (IR)</option></select>
+      <label style="text-transform:none;font-size:13px;color:var(--txt);margin:0"><input type="checkbox" ${p.r?'checked':''} onchange="setP(${i},'r',this.checked)"> panier</label></div></div>`);
+    h+=`<button class="g" onclick="addP()" style="width:100%">+ Ajouter une pause</button></div>
+    <div style="margin-top:11px"><label style="text-transform:none;font-size:14px;color:var(--txt)"><input type="checkbox" ${d.fer?'checked':''} onchange="setD('fer',this.checked)"> ☀️ Jour férié travaillé</label></div>`;
+  }
+  $('dWork').innerHTML=h;
+  $('dNote').value=d.note||'';
+  $('dKpi').innerHTML=[['Amplitude',F(r.amp)],['TTE',F(r.tte)],['Pauses',F(r.pz)],['IDAJ',r.idaj?F(r.idaj):'—'],['Paniers',(r.ir+r.iru)||'—']]
+    .map(x=>`<div class="kpi"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
+  $('dAl').innerHTML=r.al.map(a=>`<div class="al ${a.lvl}">${a.m}</div>`).join('');
+
+  const diff=Math.round((dOf(k)-dOf(DB.s.anchor))/864e5),qs=addD(DB.s.anchor,Math.floor(diff/14)*14);
+  const c=calcPer(qs,1),o=c.Q[0],N=DB.s.base*120,pc=Math.min(100,o.seuil/N*100);
+  $('dQuat').innerHTML=`<div class="mut">${short(qs)} → ${short(addD(qs,13))}</div>
+  <div class="bar"><i style="width:${pc}%"></i></div>
+  <div class="row" style="justify-content:space-between"><span><b>${F(o.seuil)}</b> cumulées</span>
+  <span class="mut">${o.seuil<N?'reste '+F(N-o.seuil)+' avant HS':'HS : '+F(o.h25)+' à 25 % · '+F(o.h50)+' à 50 %'}</span></div>`;
+}
+
+function goMonth(n){const d=dOf(curMonth+'-01');d.setMonth(d.getMonth()+n);curMonth=isoOf(d).slice(0,7);renderMonth()}
+function renderMonth(){
+  $('mLbl').textContent=MON[+curMonth.slice(5,7)-1]+' '+curMonth.slice(0,4);
+  let h=['L','M','M','J','V','S','D','Σ'].map(x=>`<div class="h">${x}</div>`).join('');
+  let cur=mono(curMonth+'-01');const G={amp:0,tte:0,trav:0,ir:0,iru:0,idaj:0};
+  for(let w=0;w<6;w++){
+    let wa=0,wt=0;
+    for(let i=0;i<7;i++){
+      const k=addD(cur,w*7+i),r=cd(k),out=k.slice(0,7)!==curMonth;
+      if(!out){wa+=r.amp;wt+=r.tte;G.amp+=r.amp;G.tte+=r.tte;G.trav+=r.trav;G.ir+=r.ir;G.iru+=r.iru;G.idaj+=r.idaj}
+      h+=`<div class="cel ${r.t||''} ${out?'off':''} ${k===today()?'now':''}" onclick="curDate='${k}';tab('jour')">
+      <div class="d">${+k.slice(8)}</div><div class="v">${r.tte?F(r.tte):(r.t==='RC'?'RC':r.t==='CP'?'CP':r.t==='MAL'?'AM':'')}</div>
+      <div style="font-size:9px">${DB.days[k]&&DB.days[k].fer?'☀️':''}${r.ir+r.iru?'🍽️':''}</div></div>`;
+    }
+    h+=`<div class="rec">${wt?F(wa)+'<b>'+F(wt)+'</b>':''}</div>`;
+    if(addD(cur,w*7+7).slice(0,7)!==curMonth&&w>=3)break;
+  }
+  $('mCal').innerHTML=h;
+  $('mKpi').innerHTML=[['Amplitude',F(G.amp)],['TTE',F(G.tte)],['Jours',G.trav],['Paniers',G.ir+G.iru],['IDAJ',C2(G.idaj)]]
+    .map(x=>`<div class="kpi"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
+}
+
+function goPer(n){DB.per.start=addD(DB.per.start,n*14*DB.per.nb);save();renderPay()}
+function renderPay(){
+  const S=DB.s,st=DB.per.start,nb=DB.per.nb;
+  $('pS').value=st;$('pN').value=nb;$('pP25').value=DB.per.p25;$('pP50').value=DB.per.p50;$('pRC').value=DB.per.rcOld;
+  $('pLbl').textContent=short(st)+' → '+short(addD(st,nb*14-1));
+  const df=Math.round((dOf(st)-dOf(S.anchor))/864e5),off=((df%14)+14)%14;
+  $('pAlign').innerHTML=off===0?'<div class="al k">✅ Période alignée sur tes quatorzaines</div>'
+    :'<div class="al w">⚠️ Décalage de '+off+' jour(s) avec l\'ancrage — les HS seront faussées</div>';
+  const {Q,AL,G}=calcPer(st,nb);
+  $('pKpi').innerHTML=[['Amplitude',F(G.amp)],['TTE',F(G.tte)],['HS 25 %',F(G.h25)],['HS 50 %',F(G.h50)],
+    ['Jours',G.trav],['Paniers',G.ir+G.iru],['IDAJ',C2(G.idaj)],['Habillage',C2(G.hab)+' h']]
+    .map(x=>`<div class="kpi"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
+  let h='<tr><th>Détail</th><th class="n">Ampl.</th><th class="n">TTE</th><th class="n">Norm.</th><th class="n">25 %</th><th class="n">50 %</th></tr>';
+  Q.forEach((o,i)=>{
+    o.w.forEach((s,j)=>h+=`<tr><td>Sem. ${j+1} — ${short(s.start)}</td><td class="n">${F(s.amp)}</td><td class="n">${F(s.tte)}</td><td class="n mut" colspan="3">${s.trav} j</td></tr>`);
+    h+=`<tr class="q"><td>Quatorzaine ${i+1}</td><td class="n">${F(o.amp)}</td><td class="n">${F(o.seuil)}</td><td class="n">${F(o.nor)}</td><td class="n">${F(o.h25)}</td><td class="n">${F(o.h50)}</td></tr>`});
+  h+=`<tr class="t"><td>TOTAL</td><td class="n">${F(G.amp)}</td><td class="n">${F(G.tte)}</td><td class="n">${F(G.nor)}</td><td class="n">${F(G.h25)}</td><td class="n">${F(G.h50)}</td></tr>`;
+  $('pTab').innerHTML=h;
+  $('pAl').innerHTML=AL.length?AL.map(a=>`<div class="al ${a.lvl}"><b>${short(a.k)}</b> — ${a.m}</div>`).join(''):'<div class="al k">✅ Aucune anomalie détectée</div>';
+  const {L,tot,pan}=brutOf(G);
+  $('pBrut').innerHTML='<tr><th>Élément</th><th class="n">Qté</th><th class="n">Taux</th><th class="n">Montant</th></tr>'
+    +L.map(x=>`<tr><td>${x[0]}</td><td class="n">${x[1]}</td><td class="n mut">${x[2]}</td><td class="n">${EUR(x[3])}</td></tr>`).join('')
+    +`<tr class="t"><td>Brut soumis</td><td colspan="2"></td><td class="n">${EUR(tot)}</td></tr>`
+    +`<tr><td>Net estimé</td><td colspan="2" class="n mut">× ${S.net}</td><td class="n">${EUR(tot*S.net)}</td></tr>`
+    +`<tr><td>Paniers <span class="mut">(${G.ir} IR + ${G.iru} IRU)</span></td><td colspan="2"></td><td class="n">+ ${EUR(pan)}</td></tr>`
+    +`<tr class="t"><td>Total versé estimé</td><td colspan="2"></td><td class="n">${EUR(tot*S.net+pan)}</td></tr>`;
+  const d25=Math.max(G.h25/60-DB.per.p25,0),d50=Math.max(G.h50/60-DB.per.p50,0);
+  const acq=d25*1.25+d50*1.5,sol=DB.per.rcOld+acq,perdu=d25*S.taux*1.25+d50*S.taux*1.5;
+  $('pRcOut').innerHTML=`<table>
+  <tr><th>Type</th><th class="n">Dues</th><th class="n">Payées</th><th class="n">→ RC</th><th class="n">× majo.</th></tr>
+  <tr><td>HS 25 %</td><td class="n">${C2(G.h25)}</td><td class="n">${DB.per.p25.toFixed(2)}</td><td class="n">${d25.toFixed(2)}</td><td class="n">${(d25*1.25).toFixed(2)}</td></tr>
+  <tr><td>HS 50 %</td><td class="n">${C2(G.h50)}</td><td class="n">${DB.per.p50.toFixed(2)}</td><td class="n">${d50.toFixed(2)}</td><td class="n">${(d50*1.5).toFixed(2)}</td></tr>
+  <tr class="t"><td>RC acquis</td><td colspan="3"></td><td class="n">${acq.toFixed(2)} h</td></tr>
+  <tr class="t"><td>Nouveau solde</td><td colspan="3"></td><td class="n">${sol.toFixed(2)} h</td></tr></table>
+  <div class="al ${sol*S.taux>1500?'w':'i'}" style="margin-top:10px">💰 Solde RC : <b>${EUR(sol*S.taux)}</b> brut · non payé ce mois : <b>${EUR(perdu)}</b><br>
+  <span class="mut">Contrôle : ${d25.toFixed(2)} × 1,25 + ${d50.toFixed(2)} × 1,50 = <b>${acq.toFixed(2)}</b> → doit égaler le « RC acquis » du bulletin.</span></div>`;
+  let c='<tr><th>Semaine</th><th class="n">TTE calculé</th><th class="n">TTE fiche</th><th class="n">Écart</th></tr>';
+  Q.forEach(o=>o.w.forEach(s=>{const v=DB.cmp[s.start]||'',e=v?P(v)-s.tte:null;
+    c+=`<tr><td>${short(s.start)}</td><td class="n">${F(s.tte)}</td>
+    <td class="n"><input type="time" value="${v}" onchange="DB.cmp['${s.start}']=this.value;save();renderPay()" style="width:100px"></td>
+    <td class="n" style="font-weight:700;color:${e===null?'var(--dim)':e===0?'var(--ok)':'var(--bad)'}">${e===null?'—':e===0?'✓':F(e)}</td></tr>`}));
+  $('pCmp').innerHTML=c;
+}
+
+const RG={rg1:[['taux','Taux horaire (€)'],['net','Coef brut → net'],['anc','Ancienneté (%)']],
+rg2:[['base','Base hebdo (h)'],['pl','Plafond HS 25 %'],['anchor','Ancrage quatorzaine'],['rc','Durée RC (min)'],['cp','Durée CP (min)'],['maxAmp','Alerte amplitude (h)']],
+rg3:[['hab','Habillage (min/j)'],['habT','Taux habillage (€/h)'],['idaj','Seuil IDAJ (h)'],['ir','IR pause ext. (€)'],['iru','IRU pause int. (€)']]};
+function renderReg(){
+  for(const g in RG)$(g).innerHTML=RG[g].map(([k,l])=>
+    `<div><label>${l}</label><input type="${k==='anchor'?'date':'number'}" step="any" value="${DB.s[k]}" onchange="DB.s['${k}']=this.type==='date'?this.value:parseFloat(this.value);save();renderAll()"></div>`).join('');
+  $('rMin').checked=DB.s.min;
+  $('rBk').innerHTML=DB.exp?'Dernier export : <b>'+DB.exp+'</b>':'<span style="color:var(--warn)">⚠️ Aucune sauvegarde effectuée</span>';
+}
+function renderAll(){if(curTab==='jour')renderDay();if(curTab==='mois')renderMonth();if(curTab==='paie')renderPay();if(curTab==='reg')renderReg()}
+
+function expo(){DB.exp=new Date().toLocaleDateString('fr-FR');save();
+  const b=new Blob([JSON.stringify(DB,null,1)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='mesheures-'+today()+'.json';a.click();renderReg()}
+function impo(i){const f=i.files[0];if(!f)return;const r=new FileReader();
+  r.onload=e=>{try{const j=JSON.parse(e.target.result);DB={...DB,...j};DB.s={...DEF,...(j.s||{})};save();renderAll();alert('Import réussi')}catch(x){alert('Fichier illisible')}};r.readAsText(f)}
+function wipe(){if(confirm('Effacer TOUTES les données ? Exporte d\'abord !')){localStorage.removeItem(LS);location.reload()}}
+function copySum(){const {Q,G}=calcPer(DB.per.start,DB.per.nb);
+  let t='Période '+short(DB.per.start)+' → '+short(addD(DB.per.start,DB.per.nb*14-1))+'\n';
+  Q.forEach((o,i)=>{o.w.forEach((s,j)=>t+='Sem '+(j+1)+' ('+short(s.start)+') : TTE '+F(s.tte)+'\n');
+    t+='→ Quatorzaine '+(i+1)+' : '+F(o.seuil)+' — HS 25% '+F(o.h25)+' · HS 50% '+F(o.h50)+'\n'});
+  t+='TOTAL : TTE '+F(G.tte)+' · amplitude '+F(G.amp)+' · '+G.trav+' jours · '+(G.ir+G.iru)+' paniers · IDAJ '+C2(G.idaj);
+  navigator.clipboard.writeText(t).then(()=>alert('Résumé copié'),()=>alert(t))}
+
+function demo(){
+  const pz=(d,f,ty,r=true)=>[{d,f,ty,r}];
+  Object.assign(DB.days,{
+  '2026-07-27':{t:'T',deb:'06:50',fin:'18:15',p:pz('12:30','13:00','EXT')},
+  '2026-07-28':{t:'T',deb:'12:10',fin:'21:00',p:[]},
+  '2026-07-29':{t:'T',deb:'10:00',fin:'17:45',p:pz('12:30','13:00','ENT')},
+  '2026-07-30':{t:'T',deb:'07:00',fin:'16:00',p:pz('12:00','12:30','EXT')},
+  '2026-07-31':{t:'T',deb:'07:45',fin:'16:45',p:pz('12:45','13:15','ENT')},
+  '2026-08-01':{t:'T',deb:'06:30',fin:'13:00',p:[]},'2026-08-02':{t:'REPOS',p:[]},
+  '2026-08-03':{t:'T',deb:'08:30',fin:'16:20',p:pz('11:15','11:45','EXT')},
+  '2026-08-04':{t:'T',deb:'10:50',fin:'18:50',p:pz('13:15','13:45','ENT')},
+  '2026-08-05':{t:'T',deb:'12:40',fin:'19:00',p:[]},
+  '2026-08-06':{t:'T',deb:'09:00',fin:'17:40',p:pz('13:45','14:15','EXT')},
+  '2026-08-07':{t:'T',deb:'14:00',fin:'18:20',p:[]},
+  '2026-08-08':{t:'T',deb:'06:30',fin:'14:20',p:[]},'2026-08-09':{t:'REPOS',p:[]},
+  '2026-08-10':{t:'T',deb:'07:50',fin:'18:50',p:pz('11:30','12:00','ENT')},
+  '2026-08-11':{t:'T',deb:'07:15',fin:'19:15',p:pz('13:30','14:00','ENT')},
+  '2026-08-12':{t:'T',deb:'08:00',fin:'16:10',p:pz('12:00','12:30','ENT')},
+  '2026-08-13':{t:'T',deb:'07:00',fin:'18:00',p:pz('11:30','12:00','EXT')},
+  '2026-08-14':{t:'T',deb:'08:45',fin:'14:00',p:pz('13:29','13:59','ENT',false)},
+  '2026-08-15':{t:'T',deb:'06:30',fin:'14:20',p:[],fer:true,note:'Assomption — codé REPOS sur la fiche employeur'},
+  '2026-08-16':{t:'REPOS',p:[]},
+  '2026-08-17':{t:'T',deb:'08:45',fin:'19:00',p:pz('11:45','12:15','EXT')},
+  '2026-08-18':{t:'T',deb:'07:40',fin:'20:20',p:pz('12:00','12:30','ENT')},
+  '2026-08-19':{t:'T',deb:'09:20',fin:'19:20',p:pz('13:00','13:30','EXT')},
+  '2026-08-20':{t:'T',deb:'05:40',fin:'17:40',p:pz('13:15','13:45','ENT')},
+  '2026-08-21':{t:'RC',p:[]},'2026-08-22':{t:'REPOS',p:[]},'2026-08-23':{t:'REPOS',p:[]}});
+  Object.assign(DB.cmp,{'2026-07-27':'50:30','2026-08-03':'41:30','2026-08-10':'44:55','2026-08-17':'42:55'});
+  DB.per={start:'2026-07-27',nb:2,p25:15,p50:0,rcOld:104.52};
+  curDate='2026-08-15';curMonth='2026-08';save();tab('paie');
+}
+
+load();
+curDate=today();curMonth=curDate.slice(0,7);
+if(!Object.keys(DB.days).length)demo();else renderAll();
+renderDay();renderReg();
+if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body>
+</html>
