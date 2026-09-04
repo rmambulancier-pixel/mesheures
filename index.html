@@ -240,9 +240,10 @@ if(d.t==='T'){
 const a=P(d.deb),b0=P(d.fin);
 if(a==null||b0==null){r.al.push({lvl:'b',m:'horaires incomplets'});return r}
 const b=b0<=a?b0+1440:b0,br=b-a;
+const pd=P(S.panDeb),pf=P(S.panFin),panOK=a<=pd&&b>=pf;
 (d.p||[]).forEach(p=>{const x=P(p.d);let y=P(p.f);
 if(x!=null&&y!=null){if(y<x)y+=1440;r.pz+=y-x}
-if(p.r){if(p.ty==='EXT')r.ir++;else r.iru++}});
+if(panOK){if(p.ty==='EXT')r.ir++;else r.iru++}});
 r.amp=br+S.hab;r.tte=br-r.pz;
 if(S.min&&r.tte<270)r.tte=270;
 r.seuil=r.tte;r.trav=1;r.deb=a;r.fin=b;
@@ -309,8 +310,8 @@ $('s-'+x).classList.toggle('on',x===t);$('t-'+x).classList.toggle('on',x===t)});
 window.scrollTo(0,0);renderAll()}
 function goDay(n){curDate=addD(curDate,n);renderDay()}
 function setD(f,v){const d=gd(curDate);d[f]=v;save();renderDay()}
-function setP(i,f,v){const d=gd(curDate);if(!d.p[i])d.p[i]={ty:'ENT',r:true};d.p[i][f]=v;save();renderDay()}
-function addP(){gd(curDate).p.push({d:'',f:'',ty:'ENT',r:true});save();renderDay()}
+function setP(i,f,v){const d=gd(curDate);if(!d.p[i])d.p[i]={ty:'ENT'};d.p[i][f]=v;save();renderDay()}
+function addP(){gd(curDate).p.push({d:'',f:'',ty:'ENT'});save();renderDay()}
 function delP(i){gd(curDate).p.splice(i,1);save();renderDay()}
 function dupli(){const y=DB.days[addD(curDate,-1)];if(!y)return alert('Rien la veille');
 DB.days[curDate]=JSON.parse(JSON.stringify(y));save();renderDay()}
@@ -325,13 +326,15 @@ if(d.t==='T'){
 h=`<div class="g2"><div><label>Début</label><input type="time" value="${d.deb||''}" onchange="setD('deb',this.value)"></div>
 <div><label>Fin</label><input type="time" value="${d.fin||''}" onchange="setD('fin',this.value)"></div></div>
 <div style="margin-top:11px"><label>Pauses</label>`;
+const _a=P(d.deb),_b0=P(d.fin);let _b=_b0;if(_a!=null&&_b!=null&&_b<=_a)_b+=1440;
+const _pd=P(DB.s.panDeb),_pf=P(DB.s.panFin),_panOK=_a!=null&&_b!=null&&_a<=_pd&&_b>=_pf;
 d.p.forEach((p,i)=>h+=`<div class="pz"><div class="row">
 <input type="time" value="${p.d||''}" onchange="setP(${i},'d',this.value)" style="flex:1">
 <input type="time" value="${p.f||''}" onchange="setP(${i},'f',this.value)" style="flex:1">
 <button class="r" onclick="delP(${i})" style="padding:8px 11px">✕</button></div>
-<div class="row" style="margin-top:7px">
+<div class="row" style="margin-top:7px;align-items:center">
 <select onchange="setP(${i},'ty',this.value)" style="flex:1"><option value="ENT"${p.ty==='ENT'?' selected':''}>Intérieur (IRU)</option><option value="EXT"${p.ty==='EXT'?' selected':''}>Extérieur (IR)</option></select>
-<label style="text-transform:none;font-size:13px;color:var(--txt);margin:0"><input type="checkbox" ${p.r?'checked':''} onchange="setP(${i},'r',this.checked)"> panier</label></div></div>`);
+<span class="mut" style="white-space:nowrap">${_panOK?'🍽️ panier dû':'pas de panier'}</span></div></div>`);
 h+=`<button class="g" onclick="addP()" style="width:100%">+ Ajouter une pause</button></div>
 <div style="margin-top:11px"><label style="text-transform:none;font-size:14px;color:var(--txt)"><input type="checkbox" ${d.fer?'checked':''} onchange="setD('fer',this.checked)"> ☀️ Jour férié travaillé (majoration 100 %)</label></div>`;
 }
@@ -519,7 +522,7 @@ const a=P(d.deb),z=P(d.fin);
 [...txt.matchAll(/(\d{1,2}:\d{2})-(\d{1,2}:\d{2}) ?\([^)]*\b(ENT|EXT)\b[^)]*\)/g)].forEach(p=>{
 const ok=a!=null&&z!=null&&a<=pd&&z>=pf;
 if(ok){p[3]==='EXT'?ir++:iru++}
-d.p.push({d:p[1],f:p[2],ty:p[3],r:ok});
+d.p.push({d:p[1],f:p[2],ty:p[3]});
 });
 if(isFerie(k)){d.fer=true;fer.push(k)}
 }
@@ -591,15 +594,15 @@ const deb=String(row['Début']||'').trim(),fin=String(row['Fin']||'').trim();
 if(nuit&&deb==='00:00'&&fin==='00:00'){warnNuit.push(k);return}
 if(!/^\d{1,2}:\d{2}$/.test(deb)||!/^\d{1,2}:\d{2}$/.test(fin)){warnH.push(k);return}
 d.deb=deb;d.fin=fin;
+const sa=P(deb);let sb=P(fin);if(sb<=sa)sb+=1440;
+const panOK=sa<=pdMin&&sb>=pfMin;
 const pz=String(row['Pauses']||'').trim();
 if(pz&&pz!=='-'){
 const pm=pz.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):?(\d{2})$/);
 if(pm){
 const pStart=pad(+pm[1])+':'+pm[2],pEnd=pad(+pm[3])+':'+pm[4];
-const pa=P(pStart),pb=P(pEnd);
-const ok=pa!=null&&pb!=null&&pa<=pdMin&&pb>=pfMin;
-d.p.push({d:pStart,f:pEnd,ty:'ENT',r:ok});
-if(ok)iru++;
+d.p.push({d:pStart,f:pEnd,ty:'ENT'});
+if(panOK)iru++;
 }
 }
 if(isFerie(k)){d.fer=true;fer.push(k)}
@@ -658,7 +661,7 @@ t+='TOTAL : TTE '+F(G.tte)+' · amplitude '+F(G.amp)+' · '+G.trav+' jours · '+
 navigator.clipboard.writeText(t).then(()=>alert('Résumé copié'),()=>prompt('Copie :',t))}
 /* ---------- exemple ---------- */
 function demo(){
-const pz=(d,f,ty,r=true)=>[{d,f,ty,r}];
+const pz=(d,f,ty)=>[{d,f,ty}];
 Object.assign(DB.days,{
 '2026-07-27':{t:'T',deb:'06:50',fin:'18:15',p:pz('12:30','13:00','EXT')},
 '2026-07-28':{t:'T',deb:'12:10',fin:'21:00',p:[]},
@@ -676,7 +679,7 @@ Object.assign(DB.days,{
 '2026-08-11':{t:'T',deb:'07:15',fin:'19:15',p:pz('13:30','14:00','ENT')},
 '2026-08-12':{t:'T',deb:'08:00',fin:'16:10',p:pz('12:00','12:30','ENT')},
 '2026-08-13':{t:'T',deb:'07:00',fin:'18:00',p:pz('11:30','12:00','EXT')},
-'2026-08-14':{t:'T',deb:'08:45',fin:'14:00',p:pz('13:29','13:59','ENT',false)},
+'2026-08-14':{t:'T',deb:'08:45',fin:'14:00',p:pz('13:29','13:59','ENT')},
 '2026-08-15':{t:'T',deb:'06:30',fin:'14:20',p:[],fer:true,note:'Assomption — codé REPOS sur la fiche employeur'},
 '2026-08-16':{t:'REPOS',p:[]},
 '2026-08-17':{t:'T',deb:'08:45',fin:'19:00',p:pz('11:45','12:15','EXT')},
@@ -698,4 +701,3 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catc
 </script>
 </body>
 </html>
- 
