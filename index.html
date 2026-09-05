@@ -500,7 +500,18 @@ let text='';
 for(let p=1;p<=pdf.numPages;p++){
 const page=await pdf.getPage(p);
 const content=await page.getTextContent();
-text+=content.items.map(it=>it.str).join(' ')+'\n';
+let line='',prevY=null,prevEndX=null;
+content.items.forEach(it=>{
+const x=it.transform[4],y=it.transform[5];
+if(prevY!=null&&Math.abs(y-prevY)>2){text+=line+'\n';line=''}
+else if(prevEndX!=null){
+const gap=x-prevEndX;
+if(gap>(it.height||10)*0.22)line+=' ';
+}
+line+=it.str;
+prevY=y;prevEndX=x+(it.width||0);
+});
+text+=line+'\n';
 }
 if(!text.trim()){
 out.innerHTML='<div class="al b">❌ Aucun texte trouvé dans ce PDF — c\'est peut-être un scan/une image plutôt qu\'un vrai PDF texte. Utilise le copier-coller si l\'ouverture du PDF permet de sélectionner le texte.</div>';
