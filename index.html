@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0d1117">
 <title>MesHeures</title>
 <link rel="manifest" href="./manifest.json">
 <link rel="icon" href="./icon.svg">
+<!-- Scripts chargés en defer pour ne plus bloquer le rendu -->
+<script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js"></script>
 <style>
 :root{--bg:#0d1117;--card:#161b22;--line:#30363d;--txt:#e6edf3;--dim:#8b949e;--ok:#3fb950;--warn:#d29922;--bad:#f85149;--acc:#238636;--blue:#58a6ff}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -125,84 +126,72 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 <div><label>Début de période</label><input type="date" id="pS" onchange="DB.per.start=this.value;save();renderPay()"></div>
 <div><label>Nb de quatorzaines</label><input type="number" min="1" max="6" id="pN" onchange="DB.per.nb=+this.value;save();renderPay()"></div>
 </div>
-<div id="pAlign" style="margin-top:9px"></div>
-<button class="g" style="width:100%;margin-top:4px" onclick="regPer()">Enregistrer cette période dans l'audit</button>
+<div style="margin-top:9px" id="pAlign"></div>
+<button onclick="regPer()" style="margin-top:6px;width:100%">Enregistrer cette période dans l'audit</button>
 </div>
-<div class="card"><h2>Synthèse</h2><div class="kpis" id="pKpi"></div>
-<table id="pTab" style="margin-top:13px"></table></div>
-<div class="card"><h2>⚠️ Contrôles de conformité</h2><div id="pAl"></div></div>
-<div class="card"><h2>💶 Brut recalculé</h2><table id="pBrut"></table></div>
-<div class="card"><h2>🔄 HS payées vs converties en RC</h2>
-<div class="grid">
+<div class="card"><h2>KPIs</h2><div class="kpis" id="pKpi"></div></div>
+<div class="card"><h2>Détail HS</h2><div style="overflow-x:auto"><table id="pTab"></table></div></div>
+<div class="card"><h2>Anomalies</h2><div id="pAl"></div></div>
+<div class="card"><h2>Brut estimé</h2><div style="overflow-x:auto"><table id="pBrut"></table></div>
+<button class="g" onclick="copySum()" style="margin-top:9px;width:100%">📋 Copier le résumé</button></div>
+<div class="card"><h2>Repos compensateur</h2>
+<div class="g2">
 <div><label>HS 25 % payées (h)</label><input type="number" step="0.01" id="pP25" onchange="setBul('p25',+this.value)"></div>
 <div><label>HS 50 % payées (h)</label><input type="number" step="0.01" id="pP50" onchange="setBul('p50',+this.value)"></div>
-<div><label>Solde RC antérieur (h)</label><input type="number" step="0.01" id="pRC" onchange="setBul('rcOld',+this.value)"></div>
-<div><label>RC acquis selon bulletin</label><input type="number" step="0.01" id="pRCA" onchange="setBul('rcAcq',+this.value)"></div>
 </div>
-<div id="pRcOut" style="margin-top:11px"></div></div>
-<div class="card"><h2>🔍 Comparaison fiche employeur</h2>
-<div class="mut" style="margin-bottom:9px">Saisis le TTE de chaque semaine tel qu'il figure sur ta fiche.</div>
-<table id="pCmp"></table></div>
-<div class="fab">
-<button class="g" onclick="copySum()">📋 Copier</button>
-<button class="g" onclick="window.print()">🖨️ PDF</button>
+<div class="g2" style="margin-top:9px">
+<div><label>RC antérieur (h)</label><input type="number" step="0.01" id="pRC" onchange="setBul('rcOld',+this.value)"></div>
+<div><label>RC bulletin (h)</label><input type="number" step="0.01" id="pRCA" onchange="setBul('rcAcq',+this.value)"></div>
 </div>
+<div id="pRcOut" style="margin-top:9px"></div></div>
+<div class="card"><h2>Comparaison TTE</h2><div style="overflow-x:auto"><table id="pCmp"></table></div></div>
 </section>
 <section id="s-audit">
-<div class="card"><h2>📊 Vue d'ensemble</h2>
-<div class="mut" style="margin-bottom:10px">Toutes les périodes enregistrées. Saisis les valeurs de chaque bulletin pour voir les écarts.</div>
-<div class="kpis" id="aKpi"></div></div>
+<div class="card"><h2>Vue d'ensemble</h2><div class="kpis" id="aKpi"></div></div>
 <div class="card"><h2>Périodes</h2><div style="overflow-x:auto"><table id="aTab"></table></div></div>
-<div class="card"><h2>☀️ Jours fériés travaillés</h2><div id="aFer"></div></div>
-<div class="card"><h2>🚩 Anomalies sur tout l'historique</h2><div id="aAl"></div></div>
-<div class="fab"><button class="g" onclick="window.print()">🖨️ Exporter le dossier en PDF</button></div>
+<div class="card"><h2>Jours fériés travaillés</h2><div id="aFer"></div></div>
+<div class="card"><h2>Anomalies critiques</h2><div id="aAl"></div></div>
 </section>
 <section id="s-reg">
-<div class="card"><h2>Mon poste</h2><div class="grid" id="rg1"></div></div>
-<div class="card"><h2>Heures &amp; quatorzaine</h2><div class="grid" id="rg2"></div>
-<div style="margin-top:9px"><label><input type="checkbox" id="rMin" onchange="DB.s.min=this.checked;save();renderAll()"> Appliquer le TTE minimum de 4h30</label></div></div>
-<div class="card"><h2>Indemnités</h2><div class="grid" id="rg3"></div>
-<div class="mut" style="margin-top:8px">Un panier est dû si le service couvre entièrement la plage repas ci-dessus.</div></div>
-<div class="card"><h2>📥 Importer depuis AmbuTrack</h2>
-<div class="mut" style="margin-bottom:9px">Dans AmbuTrack, télécharge le PDF de ta période, puis choisis-le directement ici — pas besoin de l'ouvrir ni de copier-coller quoi que ce soit.</div>
+<div class="card"><h2>Tarifs & paramètres</h2>
+<div class="grid" id="rg1"></div></div>
+<div class="card"><h2>Quatorzaines & durées</h2>
+<div class="grid" id="rg2"></div>
+<div style="margin-top:9px"><label style="text-transform:none;font-size:14px;color:var(--txt)"><input type="checkbox" id="rMin" onchange="DB.s.min=this.checked;save();renderAll()"> TTE minimale 4h30 (si contrat)</label></div>
+</div>
+<div class="card"><h2>Paniers & habillage</h2><div class="grid" id="rg3"></div></div>
+<div class="card"><h2>Import AmbuTrack — PDF</h2>
+<div style="margin-bottom:8px"><label>Fichier PDF AmbuTrack</label>
+<input type="file" accept=".pdf,application/pdf" id="fpdf" onchange="parsePdfFile(this.files[0])"></div>
+<label>ou coller le texte ici</label>
+<textarea id="impTxt" rows="6" placeholder="Colle ici le texte copié depuis le PDF AmbuTrack…"></textarea>
+<button onclick="parsePDF()" style="margin-top:7px;width:100%">Importer le texte</button>
+<div id="impOut" style="margin-top:9px"></div>
+</div>
+<div class="card"><h2>Import AmbuTrack — Excel</h2>
+<input type="file" accept=".xlsx,.xls" id="fx" onchange="parseExcel(this.files[0])">
+</div>
+<div class="card"><h2>Sauvegarde JSON</h2>
+<div id="rBk" style="margin-bottom:9px"></div>
 <div class="row">
-<button onclick="fpdf.click()">📄 Importer un fichier PDF</button>
-</div>
-<input type="file" id="fpdf" accept=".pdf" style="display:none" onchange="parsePdfFile(this.files[0])">
-<div style="margin-top:14px;border-top:1px solid var(--line);padding-top:12px">
-<div class="mut" style="margin-bottom:9px">Le bouton ne fonctionne pas, ou tu préfères copier-coller ? Ouvre le PDF, sélectionne tout le texte, copie, colle ici. <b>Tu peux coller plusieurs périodes à la suite</b> : elles seront toutes importées d'un coup.</div>
-<textarea id="impTxt" rows="6" placeholder="Colle ici le texte des PDF AmbuTrack…"></textarea>
-<div class="row" style="margin-top:9px">
-<button class="g" onclick="parsePDF()">Analyser et importer</button>
-<button class="g" onclick="impTxt.value='';impOut.innerHTML=''">Vider</button>
+<button class="g" onclick="expo()">⬇ Exporter</button>
+<label style="text-transform:none;flex:1"><input type="file" accept=".json" onchange="impo(this)" style="display:none" id="impJ">
+<button class="g" onclick="$('impJ').click()" style="width:100%">⬆ Importer JSON</button></label>
+<button class="r" onclick="wipe()">🗑 Effacer tout</button>
 </div>
 </div>
-<div style="margin-top:14px;border-top:1px solid var(--line);padding-top:12px">
-<div class="mut" style="margin-bottom:9px">Autre option — si AmbuTrack te laisse exporter un fichier Excel (.xlsx) de ton historique, importe-le directement ici. Ça couvre toute la période d'un coup.</div>
-<div class="row">
-<button class="g" onclick="fx.click()">📊 Importer un fichier Excel</button>
+<div class="card"><h2>Données archivées (PDF)</h2>
+<div class="al i">📦 <b>Archive AmbuTrack chargée en mémoire</b> : période du 19/05/2025 au 06/09/2026 — Mickael Roth · Ambulance de l'uby.<br>
+Ces données sont pré-chargées au démarrage si aucune autre donnée n'est présente. Tu peux les écraser en important un autre fichier ou en modifiant manuellement les jours.</div>
+<button class="g" onclick="loadArchive()" style="margin-top:8px;width:100%">🔄 Recharger l'archive PDF en mémoire</button>
 </div>
-<input type="file" id="fx" accept=".xlsx,.xls" style="display:none" onchange="parseExcel(this.files[0])">
-</div>
-<div id="impOut" style="margin-top:11px"></div></div>
-<div class="card"><h2>💾 Sauvegarde</h2>
-<div id="rBk" class="mut" style="margin-bottom:10px"></div>
-<div class="row">
-<button onclick="expo()">Exporter</button>
-<button class="g" onclick="fi.click()">Importer</button>
-<button class="r" onclick="wipe()">Tout effacer</button>
-</div>
-<input type="file" id="fi" accept=".json" style="display:none" onchange="impo(this)">
-<div class="mut" style="margin-top:10px">Tes données sont stockées <b>uniquement sur cet appareil</b>. Exporte le fichier JSON une fois par mois et envoie-le-toi par mail : c'est ta seule sauvegarde.</div></div>
-<div class="card"><h2>Exemple</h2>
-<button class="g" onclick="demo()">Charger la période d'août 2026</button></div>
 </section>
 </main>
 <script>
 const LS='mesheures_v2';
 const DEF={taux:14.02,net:0.787,hab:10,habT:12.9688,idaj:12,base:35,pl:16,ir:15.70,iru:9.69,
-rc:420,cp:420,anc:0,min:false,maxAmp:14,anchor:'2026-06-01',panDeb:'11:45',panFin:'14:15'};
-let DB={s:{...DEF},days:{},cmp:{},periods:[],bul:{},per:{start:'2026-07-27',nb:2},exp:null};
+rc:420,cp:420,anc:0,min:false,maxAmp:14,anchor:'2025-05-19',panDeb:'11:45',panFin:'14:15'};
+let DB={s:{...DEF},days:{},cmp:{},periods:[],bul:{},per:{start:'2025-05-19',nb:1},exp:null};
 let curDate,curMonth,curTab='jour';
 const $=i=>document.getElementById(i);
 const pad=n=>String(n).padStart(2,'0');
@@ -221,7 +210,8 @@ const C2=m=>(m/60).toFixed(2);
 const EUR=n=>n.toFixed(2).replace('.',',')+' €';
 const short=s=>s.slice(8)+'/'+s.slice(5,7);
 const shortY=s=>s.slice(8)+'/'+s.slice(5,7)+'/'+s.slice(2,4);
-/* ---------- fériés ---------- */
+
+/* ---------- fériés (mis en cache par année) ---------- */
 function easterOf(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,
 f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,
 l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),
@@ -232,6 +222,7 @@ const s=new Set([y+'-01-01',y+'-05-01',y+'-05-08',y+'-07-14',y+'-08-15',y+'-11-0
 const e=easterOf(y);[1,39,50].forEach(n=>{const d=new Date(e);d.setDate(d.getDate()+n);s.add(isoOf(d))});
 return FC[y]=s}
 const isFerie=k=>feriesY(+k.slice(0,4)).has(k);
+
 /* ---------- stockage ---------- */
 function save(){try{localStorage.setItem(LS,JSON.stringify(DB))}catch(e){alert('Sauvegarde impossible : '+e.message)}}
 function load(){try{const r=JSON.parse(localStorage.getItem(LS));if(r){DB={...DB,...r};
@@ -239,6 +230,458 @@ DB.s={...DEF,...(r.s||{})};DB.per={...DB.per,...(r.per||{})};DB.periods=r.period
 function gd(k){if(!DB.days[k])DB.days[k]={t:'REPOS',p:[]};if(!DB.days[k].p)DB.days[k].p=[];return DB.days[k]}
 function gb(s){if(!DB.bul[s])DB.bul[s]={p25:0,p50:0,rcOld:0,rcAcq:0};return DB.bul[s]}
 function setBul(f,v){gb(DB.per.start)[f]=v;save();renderPay()}
+
+/* ==========================================================
+   ARCHIVE PDF — données pré-chargées (Mickael Roth, 19/5/2025 → 6/9/2026)
+   Chaque entrée : [clé ISO, type, deb, fin, [[pd,pf,ty],...], férié?]
+   ========================================================== */
+const ARCHIVE_PERIODS=[
+  {start:'2025-05-19',nb:1},{start:'2025-05-26',nb:1},
+  {start:'2025-06-02',nb:1},{start:'2025-06-09',nb:1},
+  {start:'2025-06-16',nb:1},{start:'2025-06-23',nb:1},
+  {start:'2025-06-30',nb:1},{start:'2025-07-07',nb:1},
+  {start:'2025-07-25',nb:1},
+  {start:'2025-07-28',nb:1},{start:'2025-08-04',nb:1},
+  {start:'2025-08-11',nb:1},{start:'2025-08-18',nb:1},
+  {start:'2025-08-25',nb:1},{start:'2025-09-01',nb:1},
+  {start:'2025-09-08',nb:1},{start:'2025-09-15',nb:1},
+  {start:'2025-09-22',nb:1},{start:'2025-09-29',nb:1},
+  {start:'2025-10-06',nb:1},{start:'2025-10-13',nb:1},
+  {start:'2025-10-20',nb:1},{start:'2025-10-29',nb:1},
+  {start:'2025-11-03',nb:1},{start:'2025-11-12',nb:1},
+  {start:'2025-11-17',nb:1},{start:'2025-11-24',nb:1},
+  {start:'2025-12-01',nb:1},{start:'2025-12-08',nb:1},
+  {start:'2025-12-15',nb:1},{start:'2025-12-22',nb:1},
+  {start:'2025-12-29',nb:1},
+  {start:'2026-01-05',nb:1},{start:'2026-01-12',nb:1},{start:'2026-01-19',nb:1},
+  {start:'2026-01-26',nb:1},{start:'2026-02-02',nb:1},
+  {start:'2026-02-09',nb:1},{start:'2026-02-16',nb:1},
+  {start:'2026-02-23',nb:1},{start:'2026-03-02',nb:1},
+  {start:'2026-03-09',nb:1},{start:'2026-03-16',nb:1},
+  {start:'2026-03-23',nb:1},{start:'2026-03-30',nb:1},
+  {start:'2026-04-06',nb:1},{start:'2026-04-13',nb:1},
+  {start:'2026-04-20',nb:1},{start:'2026-04-27',nb:1},
+  {start:'2026-05-04',nb:1},{start:'2026-05-11',nb:1},
+  {start:'2026-05-18',nb:1},{start:'2026-05-25',nb:1},
+  {start:'2026-06-01',nb:1},{start:'2026-06-08',nb:1},
+  {start:'2026-06-15',nb:1},{start:'2026-06-22',nb:1},
+  {start:'2026-06-29',nb:1},{start:'2026-07-06',nb:1},
+  {start:'2026-07-13',nb:1},{start:'2026-07-20',nb:1},
+  {start:'2026-07-27',nb:1},{start:'2026-08-03',nb:1},
+  {start:'2026-08-10',nb:1},{start:'2026-08-17',nb:1},
+  {start:'2026-08-24',nb:1},{start:'2026-08-31',nb:1}
+];
+
+// Format : [iso, type, deb|null, fin|null, [[pd,pf,ty],...], fer?]
+// type : 'T'=travail, 'REPOS', 'RC', 'CP', 'MAL'
+const ARCHIVE_DAYS=[
+// === 2025 ===
+// Sem 21 Q19/5→1/6
+['2025-05-19','T','08:00','20:00',[],false],
+['2025-05-21','T','08:00','20:00',[],false],
+['2025-05-23','T','07:20','18:30',[['12:55','13:25','ENT']],false],
+// Sem 22
+['2025-05-26','T','05:40','12:50',[],false],
+['2025-05-27','T','07:20','19:30',[['13:25','13:55','ENT']],false],
+['2025-05-28','T','09:00','19:30',[['14:15','14:45','ENT']],false],
+['2025-05-29','T','08:00','15:00',[],false],
+['2025-05-30','T','11:00','17:40',[],false],
+// Sem 23 Q2/6→15/6
+['2025-06-02','T','11:45','20:35',[],false],
+['2025-06-03','T','06:45','17:40',[['12:12','12:42','ENT']],false],
+['2025-06-04','T','09:15','18:50',[['14:02','14:32','ENT']],false],
+['2025-06-05','T','09:50','18:15',[['14:02','14:32','ENT']],false],
+['2025-06-06','T','05:40','16:20',[['11:00','11:30','ENT']],false],
+// Sem 24
+['2025-06-09','T','07:00','14:00',[],false],
+['2025-06-10','T','07:00','17:40',[['12:20','12:50','ENT']],false],
+['2025-06-11','T','10:50','19:40',[['15:15','15:45','ENT']],false],
+['2025-06-12','T','08:30','18:00',[['13:15','13:45','ENT']],false],
+['2025-06-13','T','07:00','18:00',[['12:30','13:00','ENT']],false],
+// Sem 25 Q16/6→29/6
+['2025-06-16','T','07:40','17:30',[['12:35','13:05','ENT']],false],
+['2025-06-17','T','07:30','19:10',[['13:20','13:50','ENT']],false],
+['2025-06-18','T','07:20','16:00',[['11:40','12:10','ENT']],false],
+['2025-06-19','T','09:15','18:20',[['13:47','14:17','ENT']],false],
+['2025-06-20','T','04:30','14:50',[['09:40','10:10','ENT']],false],
+// Sem 26
+['2025-06-23','T','07:20','17:30',[['12:25','12:55','ENT']],false],
+['2025-06-24','T','11:45','18:10',[],false],
+['2025-06-25','T','07:15','13:00',[],false],
+['2025-06-26','T','09:20','19:30',[['14:25','14:55','ENT']],false],
+['2025-06-27','T','07:30','13:50',[],false],
+// Sem 27 Q30/6→13/7
+['2025-06-30','T','11:45','20:10',[],false],
+['2025-07-01','T','09:30','19:20',[['14:25','14:55','ENT']],false],
+['2025-07-02','T','06:50','17:50',[['12:20','12:50','ENT']],false],
+['2025-07-03','T','13:30','21:00',[],false],
+['2025-07-04','T','09:50','19:00',[['14:25','14:55','ENT']],false],
+// Sem 28
+['2025-07-07','T','09:40','20:00',[['14:50','15:20','ENT']],false],
+['2025-07-08','T','14:30','19:30',[],false],
+['2025-07-09','T','06:00','17:00',[['11:30','12:00','ENT']],false],
+['2025-07-10','T','09:00','19:30',[['14:15','14:45','ENT']],false],
+['2025-07-11','T','08:30','18:10',[['13:20','13:50','ENT']],false],
+// Sem 30 Q14/7→27/7 (partielle)
+['2025-07-25','T','13:20','19:20',[],false],
+// Sem 31 Q28/7→10/8
+['2025-07-28','T','09:20','17:50',[['13:35','14:05','ENT']],false],
+['2025-07-29','T','06:30','18:15',[['12:22','12:52','ENT']],false],
+['2025-07-30','T','06:45','13:00',[],false],
+['2025-07-31','T','06:30','18:20',[['12:25','12:55','ENT']],false],
+['2025-08-01','T','06:30','17:00',[['11:45','12:15','ENT']],false],
+// Sem 32
+['2025-08-04','T','09:30','18:50',[['14:10','14:40','ENT']],false],
+['2025-08-05','T','07:45','13:35',[],false],
+['2025-08-06','T','09:40','16:15',[['12:57','13:27','ENT']],false],
+['2025-08-07','T','06:15','14:35',[],false],
+// Sem 33 Q11/8→24/8
+['2025-08-11','T','07:00','14:00',[],false],
+['2025-08-12','T','06:50','15:20',[['11:05','11:35','ENT']],false],
+['2025-08-13','T','07:00','16:00',[['11:30','12:00','ENT']],false],
+['2025-08-14','T','12:20','19:30',[],false],
+['2025-08-15','T','07:00','17:45',[['12:22','12:52','ENT']],true],
+// Sem 34
+['2025-08-18','T','07:00','17:00',[['12:00','12:30','ENT']],false],
+['2025-08-19','T','07:45','20:10',[['13:57','14:27','ENT']],false],
+['2025-08-20','T','08:00','17:05',[['12:32','13:02','ENT']],false],
+['2025-08-21','T','06:30','18:10',[['12:20','12:50','ENT']],false],
+['2025-08-22','T','07:45','18:30',[['13:07','13:37','ENT']],false],
+// Sem 35 Q25/8→7/9
+['2025-08-25','T','06:45','16:00',[['11:22','11:52','ENT']],false],
+['2025-08-26','T','08:15','18:30',[['13:22','13:52','ENT']],false],
+['2025-08-27','T','08:45','17:15',[['13:00','13:30','ENT']],false],
+['2025-08-28','T','07:00','18:15',[['12:37','13:07','ENT']],false],
+['2025-08-29','T','10:15','18:20',[['14:17','14:47','ENT']],false],
+// Sem 36
+['2025-09-01','T','11:45','19:30',[],false],
+['2025-09-02','T','07:30','18:30',[['13:00','13:30','ENT']],false],
+['2025-09-03','T','06:50','16:20',[['11:35','12:05','ENT']],false],
+['2025-09-04','T','06:30','16:20',[['11:25','11:55','ENT']],false],
+['2025-09-05','T','07:40','16:05',[['11:52','12:22','ENT']],false],
+// Sem 37 Q8/9→21/9
+['2025-09-08','T','09:50','18:10',[['14:00','14:30','ENT']],false],
+['2025-09-09','T','07:30','18:00',[['12:45','13:15','ENT']],false],
+['2025-09-10','T','06:20','17:40',[['12:00','12:30','ENT']],false],
+['2025-09-11','T','10:30','16:30',[['13:30','14:00','ENT']],false],
+['2025-09-12','T','06:15','19:00',[['12:37','13:07','ENT']],false],
+// Sem 38
+['2025-09-15','T','10:15','17:20',[['13:47','14:17','ENT']],false],
+['2025-09-16','T','06:15','17:00',[['11:37','12:07','ENT']],false],
+// 17/9 NUIT horaires 00:00-00:00 → ignoré (non exploitable)
+['2025-09-18','T','06:40','18:20',[['12:30','13:00','ENT']],false],
+['2025-09-19','T','07:20','17:40',[['12:30','13:00','ENT']],false],
+// Sem 39 Q22/9→5/10
+['2025-09-22','T','13:30','20:30',[],false],
+['2025-09-23','T','11:20','21:20',[],false],
+['2025-09-24','T','09:00','19:00',[['14:00','14:30','ENT']],false],
+['2025-09-25','T','06:40','18:00',[['12:20','12:50','ENT']],false],
+['2025-09-26','T','11:20','19:40',[],false],
+// Sem 40
+['2025-09-29','T','09:15','20:20',[['14:47','15:17','ENT']],false],
+['2025-09-30','T','08:20','18:45',[['13:32','14:02','ENT']],false],
+['2025-10-01','T','09:00','18:30',[['13:45','14:15','ENT']],false],
+['2025-10-02','T','06:40','15:20',[['11:00','11:30','ENT']],false],
+['2025-10-03','T','07:30','17:30',[['12:30','13:00','ENT']],false],
+// Sem 41 Q6/10→19/10
+['2025-10-06','T','07:15','13:00',[],false],
+['2025-10-07','T','07:45','17:50',[['12:47','13:17','ENT']],false],
+['2025-10-08','T','06:50','18:00',[['12:25','12:55','ENT']],false],
+['2025-10-09','T','07:30','19:00',[['13:15','13:45','ENT']],false],
+['2025-10-10','T','07:40','18:30',[['13:05','13:35','ENT']],false],
+// Sem 42
+['2025-10-13','T','05:20','19:00',[['12:10','12:40','ENT']],false],
+['2025-10-14','T','13:20','19:40',[],false],
+['2025-10-15','T','08:00','18:20',[['13:10','13:40','ENT']],false],
+['2025-10-16','T','09:10','19:50',[['14:30','15:00','ENT']],false],
+['2025-10-17','T','08:15','19:50',[['14:02','14:32','ENT']],false],
+// Sem 43 Q20/10→2/11
+['2025-10-20','T','09:20','19:00',[['14:10','14:40','ENT']],false],
+['2025-10-21','T','06:40','17:30',[['12:05','12:35','ENT']],false],
+['2025-10-22','T','06:45','17:45',[['12:15','12:45','ENT']],false],
+['2025-10-23','T','06:00','14:20',[['10:10','10:40','ENT']],false],
+['2025-10-24','T','07:30','15:20',[['11:25','11:55','ENT']],false],
+// Sem 44
+['2025-10-29','T','09:00','19:00',[['14:00','14:30','ENT']],false],
+['2025-10-30','T','08:45','19:00',[['13:52','14:22','ENT']],false],
+['2025-10-31','T','06:40','18:00',[['12:20','12:50','ENT']],false],
+// Sem 45 Q3/11→16/11
+['2025-11-03','T','09:40','20:00',[['14:50','15:20','ENT']],false],
+['2025-11-04','T','11:00','20:30',[],false],
+['2025-11-05','T','07:30','16:30',[['12:00','12:30','ENT']],false],
+['2025-11-06','T','12:00','20:20',[],false],
+['2025-11-07','T','08:00','17:00',[['12:30','13:00','ENT']],false],
+// Sem 46
+['2025-11-12','T','06:30','17:40',[['12:05','12:35','ENT']],false],
+['2025-11-13','T','06:40','19:00',[['12:50','13:20','ENT']],false],
+['2025-11-14','T','06:30','17:00',[['11:45','12:15','ENT']],false],
+// Sem 47 Q17/11→30/11
+['2025-11-17','T','06:45','17:30',[['12:07','12:37','ENT']],false],
+['2025-11-18','T','09:00','14:20',[['11:40','12:10','ENT']],false],
+['2025-11-19','T','09:30','19:50',[['14:40','15:10','ENT']],false],
+['2025-11-20','T','14:10','19:00',[],false],
+['2025-11-21','T','05:40','17:00',[['11:20','11:50','ENT']],false],
+// Sem 48
+['2025-11-24','T','06:40','18:40',[['12:40','13:10','ENT']],false],
+['2025-11-25','T','06:50','18:20',[['12:35','13:05','ENT']],false],
+['2025-11-26','T','06:20','14:00',[],false],
+['2025-11-27','T','06:50','17:30',[['12:10','12:40','ENT']],false],
+['2025-11-28','T','14:00','18:00',[],false],
+// Sem 49 Q1/12→14/12
+['2025-12-01','T','07:30','17:30',[['12:30','13:00','ENT']],false],
+['2025-12-02','T','07:15','17:00',[['12:07','12:37','ENT']],false],
+['2025-12-03','T','09:20','19:30',[['14:25','14:55','ENT']],false],
+['2025-12-04','T','08:30','18:30',[['13:30','14:00','ENT']],false],
+['2025-12-05','T','08:40','19:50',[['14:15','14:45','ENT']],false],
+// Sem 50
+['2025-12-08','T','07:40','17:20',[['12:30','13:00','ENT']],false],
+['2025-12-09','T','07:30','18:50',[['13:10','13:40','ENT']],false],
+['2025-12-10','T','11:45','19:50',[],false],
+['2025-12-11','T','08:45','14:20',[],false],
+['2025-12-12','T','07:20','15:10',[['11:15','11:45','ENT']],false],
+// Sem 51 Q15/12→28/12
+['2025-12-15','T','07:45','17:30',[['12:37','13:07','ENT']],false],
+['2025-12-16','T','08:15','19:20',[['12:00','12:30','EXT']],false],
+['2025-12-17','T','07:45','18:50',[['13:17','13:47','ENT']],false],
+['2025-12-18','T','09:15','18:30',[['12:00','12:30','EXT']],false],
+['2025-12-19','T','06:45','15:20',[['11:02','11:32','ENT']],false],
+// Sem 52 — CP
+['2025-12-22','CP',null,null,[],false],
+['2025-12-23','CP',null,null,[],false],
+['2025-12-24','CP',null,null,[],false],
+['2025-12-25','CP',null,null,[],false],
+['2025-12-26','CP',null,null,[],false],
+['2025-12-27','CP',null,null,[],false],
+// === 2026 ===
+// Sem 1 Q29/12→11/1
+['2025-12-29','CP',null,null,[],false],
+['2025-12-30','CP',null,null,[],false],
+['2025-12-31','CP',null,null,[],false],
+['2026-01-01','CP',null,null,[],false],
+['2026-01-02','CP',null,null,[],false],
+// Sem 2
+['2026-01-05','T','07:20','18:10',[['12:30','13:00','EXT']],false],
+['2026-01-06','T','06:50','18:20',[['12:00','12:30','EXT']],false],
+['2026-01-07','T','06:30','14:40',[['12:20','12:50','EXT']],false],
+['2026-01-08','T','07:15','16:30',[['13:30','14:00','EXT']],false],
+['2026-01-09','T','08:30','18:20',[['13:00','13:30','ENT']],false],
+// Sem 3 Q12/1→25/1
+['2026-01-12','T','07:30','17:20',[['13:00','13:30','ENT']],false],
+['2026-01-13','T','06:30','17:40',[['11:20','11:50','EXT']],false],
+['2026-01-14','T','07:30','17:30',[['12:00','12:30','ENT']],false],
+['2026-01-15','T','12:45','18:20',[],false],
+['2026-01-16','T','08:20','18:40',[['12:00','12:30','ENT']],false],
+// Sem 4
+['2026-01-19','T','07:00','17:30',[['12:15','12:45','EXT']],false],
+['2026-01-20','T','08:30','19:00',[['12:00','12:30','EXT']],false],
+['2026-01-21','T','07:15','17:30',[['11:00','11:30','EXT']],false],
+['2026-01-22','T','10:20','18:30',[['12:00','12:30','EXT']],false],
+['2026-01-23','T','08:40','17:30',[['13:00','13:30','EXT']],false],
+// Sem 5 Q26/1→8/2
+['2026-01-26','T','10:10','17:20',[['13:30','14:00','ENT']],false],
+['2026-01-27','T','08:00','12:30',[],false],
+['2026-01-28','T','06:40','17:30',[['13:00','13:30','EXT']],false],
+['2026-01-29','T','07:40','17:20',[['12:30','13:00','ENT']],false],
+['2026-01-30','T','05:30','16:15',[['13:15','13:45','ENT']],false],
+// Sem 6
+['2026-02-02','T','09:30','19:00',[['13:30','14:00','EXT']],false],
+['2026-02-03','T','11:30','16:50',[],false],
+['2026-02-04','T','07:15','17:45',[['11:20','11:50','EXT']],false],
+['2026-02-05','T','08:30','13:50',[],false],
+['2026-02-06','T','08:10','12:20',[],false],
+// Sem 7 Q9/2→22/2 — RC
+['2026-02-09','RC',null,null,[],false],
+['2026-02-10','RC',null,null,[],false],
+['2026-02-11','RC',null,null,[],false],
+['2026-02-12','RC',null,null,[],false],
+['2026-02-13','RC',null,null,[],false],
+// Sem 8
+['2026-02-16','T','07:20','17:30',[['13:00','13:30','EXT']],false],
+['2026-02-17','T','08:15','17:00',[['12:30','13:00','EXT']],false],
+['2026-02-18','T','07:45','16:00',[['13:30','14:00','EXT']],false],
+['2026-02-19','T','08:10','18:00',[['13:00','13:30','EXT']],false],
+['2026-02-20','T','07:20','17:30',[['11:45','12:15','EXT']],false],
+// Sem 9 Q23/2→8/3
+['2026-02-23','T','07:15','13:20',[],false],
+['2026-02-24','T','06:30','18:00',[['12:15','12:45','EXT']],false],
+['2026-02-25','T','07:45','17:00',[['12:00','12:30','ENT']],false],
+['2026-02-26','T','09:00','16:00',[['13:00','13:30','ENT']],false],
+['2026-02-27','T','09:30','17:20',[['12:45','13:15','EXT']],false],
+// Sem 10
+['2026-03-02','T','06:45','13:00',[],false],
+['2026-03-03','T','06:15','14:40',[['12:30','13:00','EXT']],false],
+['2026-03-04','T','08:30','18:30',[['12:45','13:15','ENT']],false],
+['2026-03-05','T','08:20','20:30',[['12:00','12:30','EXT']],false],
+['2026-03-06','T','08:50','18:00',[['13:30','14:00','EXT']],false],
+// Sem 11 Q9/3→22/3
+['2026-03-09','T','10:15','20:30',[['14:00','14:30','ENT']],false],
+['2026-03-10','T','10:20','17:50',[['12:30','13:00','ENT']],false],
+['2026-03-11','T','10:45','16:30',[['12:00','12:30','EXT']],false],
+['2026-03-12','T','08:00','18:00',[['11:50','12:20','EXT']],false],
+['2026-03-13','T','11:00','20:20',[],false],
+['2026-03-15','T','14:45','16:10',[],false],
+// Sem 12
+['2026-03-16','T','08:20','17:20',[['11:00','11:30','ENT']],false],
+['2026-03-17','T','07:30','18:20',[['13:30','14:00','EXT']],false],
+['2026-03-18','T','06:00','16:10',[['11:20','11:50','EXT']],false],
+['2026-03-19','T','09:15','18:15',[['12:15','12:45','EXT']],false],
+['2026-03-20','T','10:30','18:10',[['13:00','13:30','EXT']],false],
+// Sem 13 Q23/3→5/4
+['2026-03-23','T','08:00','17:30',[['13:15','13:45','EXT']],false],
+['2026-03-24','RC',null,null,[],false],
+['2026-03-25','RC',null,null,[],false],
+['2026-03-26','RC',null,null,[],false],
+['2026-03-27','RC',null,null,[],false],
+// Sem 14
+['2026-03-30','T','08:15','19:40',[['13:45','14:15','EXT']],false],
+['2026-03-31','RC',null,null,[],false],
+['2026-04-01','MAL',null,null,[],false],
+['2026-04-02','MAL',null,null,[],false],
+['2026-04-03','MAL',null,null,[],false],
+// Sem 15→20 — Maladie
+['2026-04-06','MAL',null,null,[],false],['2026-04-07','MAL',null,null,[],false],
+['2026-04-08','MAL',null,null,[],false],['2026-04-09','MAL',null,null,[],false],
+['2026-04-10','MAL',null,null,[],false],
+['2026-04-13','MAL',null,null,[],false],['2026-04-14','MAL',null,null,[],false],
+['2026-04-15','MAL',null,null,[],false],['2026-04-16','MAL',null,null,[],false],
+['2026-04-17','MAL',null,null,[],false],
+['2026-04-20','MAL',null,null,[],false],['2026-04-21','MAL',null,null,[],false],
+['2026-04-22','MAL',null,null,[],false],['2026-04-23','MAL',null,null,[],false],
+['2026-04-24','MAL',null,null,[],false],
+['2026-04-27','MAL',null,null,[],false],['2026-04-28','MAL',null,null,[],false],
+['2026-04-29','MAL',null,null,[],false],['2026-04-30','MAL',null,null,[],false],
+['2026-05-01','MAL',null,null,[],false],
+['2026-05-04','MAL',null,null,[],false],['2026-05-05','MAL',null,null,[],false],
+['2026-05-06','MAL',null,null,[],false],['2026-05-07','MAL',null,null,[],false],
+['2026-05-08','MAL',null,null,[],false],
+['2026-05-11','MAL',null,null,[],false],['2026-05-12','MAL',null,null,[],false],
+['2026-05-13','MAL',null,null,[],false],['2026-05-14','MAL',null,null,[],false],
+['2026-05-15','MAL',null,null,[],false],
+['2026-05-18','MAL',null,null,[],false],['2026-05-19','MAL',null,null,[],false],
+['2026-05-20','MAL',null,null,[],false],['2026-05-21','MAL',null,null,[],false],
+['2026-05-22','MAL',null,null,[],false],
+['2026-05-25','MAL',null,null,[],false],['2026-05-26','MAL',null,null,[],false],
+['2026-05-27','MAL',null,null,[],false],['2026-05-28','MAL',null,null,[],false],
+['2026-05-29','MAL',null,null,[],false],
+['2026-06-01','MAL',null,null,[],false],['2026-06-02','MAL',null,null,[],false],
+// Retour travail sem 23 Q1/6→14/6
+['2026-06-03','T','06:10','18:00',[['12:15','12:45','EXT']],false],
+['2026-06-04','T','09:15','18:10',[['11:45','12:15','EXT']],false],
+['2026-06-05','T','11:15','19:30',[],false],
+// Sem 24
+['2026-06-08','T','08:30','17:30',[['12:00','12:30','EXT']],false],
+['2026-06-09','T','08:40','17:00',[['13:30','14:00','EXT']],false],
+['2026-06-10','T','08:10','17:30',[['11:00','11:30','EXT']],false],
+['2026-06-11','T','10:40','19:00',[['13:45','14:15','EXT']],false],
+['2026-06-12','T','07:20','18:40',[['12:30','13:00','EXT']],false],
+// Sem 25 Q15/6→28/6
+['2026-06-15','T','05:40','17:30',[['11:00','11:30','EXT']],false],
+['2026-06-16','T','08:00','16:00',[['13:45','14:15','EXT']],false],
+['2026-06-17','T','09:15','19:15',[['11:30','12:00','EXT']],false],
+['2026-06-18','T','07:15','18:20',[['12:50','13:20','ENT']],false],
+['2026-06-19','T','10:15','17:30',[['12:15','12:45','ENT']],false],
+// Sem 26
+['2026-06-22','T','12:50','17:50',[],false],
+['2026-06-23','T','07:00','17:30',[['14:00','14:30','EXT']],false],
+['2026-06-24','T','07:30','13:00',[],false],
+['2026-06-25','T','07:20','17:40',[['12:30','13:00','ENT']],false],
+['2026-06-26','T','07:30','16:30',[['11:45','12:15','EXT']],false],
+// Sem 27 Q29/6→12/7
+['2026-06-29','T','12:50','17:50',[],false],
+['2026-06-30','T','09:20','20:10',[['12:20','12:50','ENT']],false],
+['2026-07-01','T','07:30','17:30',[['12:00','12:30','EXT']],false],
+['2026-07-02','T','06:50','12:00',[],false],
+['2026-07-03','MAL',null,null,[],false],
+// Sem 28
+['2026-07-06','T','07:15','18:00',[['12:45','13:15','EXT']],false],
+['2026-07-07','T','07:45','18:45',[['13:45','14:15','EXT']],false],
+['2026-07-08','T','08:00','18:30',[['11:45','12:15','EXT']],false],
+['2026-07-09','T','06:30','16:15',[['13:15','13:45','EXT']],false],
+['2026-07-10','T','10:20','17:40',[['11:45','12:15','EXT']],false],
+// Sem 29→30 Q13/7→26/7 — CP
+['2026-07-13','CP',null,null,[],false],['2026-07-14','CP',null,null,[],false],
+['2026-07-15','CP',null,null,[],false],['2026-07-16','CP',null,null,[],false],
+['2026-07-17','CP',null,null,[],false],['2026-07-18','CP',null,null,[],false],
+['2026-07-20','CP',null,null,[],false],['2026-07-21','CP',null,null,[],false],
+['2026-07-22','CP',null,null,[],false],['2026-07-23','CP',null,null,[],false],
+['2026-07-24','CP',null,null,[],false],['2026-07-25','CP',null,null,[],false],
+// Sem 31 Q27/7→9/8
+['2026-07-27','T','06:50','18:15',[['12:30','13:00','EXT']],false],
+['2026-07-28','T','12:10','21:00',[],false],
+['2026-07-29','T','10:00','17:45',[['12:30','13:00','ENT']],false],
+['2026-07-30','T','07:00','16:00',[['12:00','12:30','EXT']],false],
+['2026-07-31','T','07:45','16:45',[['12:45','13:15','ENT']],false],
+['2026-08-01','T','06:30','13:00',[],false],
+// Sem 32
+['2026-08-03','T','08:30','16:20',[['11:15','11:45','EXT']],false],
+['2026-08-04','T','10:50','18:50',[['13:15','13:45','ENT']],false],
+['2026-08-05','T','12:40','19:00',[],false],
+['2026-08-06','T','09:00','17:40',[['13:45','14:15','EXT']],false],
+['2026-08-07','T','14:00','18:20',[],false],
+['2026-08-08','T','06:30','14:20',[],false],
+// Sem 33 Q10/8→23/8
+['2026-08-10','T','07:50','18:50',[['11:30','12:00','ENT']],false],
+['2026-08-11','T','07:15','19:15',[['13:30','14:00','ENT']],false],
+['2026-08-12','T','08:00','16:10',[['12:00','12:30','ENT']],false],
+['2026-08-13','T','07:00','18:00',[['11:30','12:00','EXT']],false],
+['2026-08-14','T','08:45','14:00',[['13:29','13:59','ENT']],false],
+['2026-08-15','T','06:30','14:20',[],true],
+// Sem 34
+['2026-08-17','T','08:45','19:00',[['11:45','12:15','EXT']],false],
+['2026-08-18','T','07:40','20:20',[['12:00','12:30','ENT']],false],
+['2026-08-19','T','09:20','19:20',[['13:00','13:30','EXT']],false],
+['2026-08-20','T','05:40','17:40',[['13:15','13:45','ENT']],false],
+['2026-08-21','RC',null,null,[],false],
+// Sem 35 Q24/8→6/9
+['2026-08-24','T','05:45','17:10',[['12:20','12:50','ENT']],false],
+['2026-08-25','T','08:30','19:30',[['14:30','15:00','EXT']],false],
+['2026-08-26','T','07:00','13:50',[['12:00','12:30','EXT']],false],
+['2026-08-27','T','08:20','19:00',[['14:30','15:00','EXT']],false],
+['2026-08-28','T','07:00','16:00',[['14:00','14:30','EXT']],false],
+['2026-08-29','T','06:30','14:20',[],false],
+// Sem 36
+['2026-08-31','T','08:20','17:40',[['12:00','12:30','EXT']],false],
+['2026-09-01','T','05:15','18:00',[['14:00','14:30','EXT']],false],
+['2026-09-02','T','12:00','18:40',[],false],
+['2026-09-03','T','08:45','20:00',[['11:30','12:00','EXT']],false],
+['2026-09-04','T','08:00','20:00',[],false],
+['2026-09-05','T','06:30','14:20',[],false],
+];
+
+function loadArchive(){
+  const S=DB.s,pd=P(S.panDeb),pf=P(S.panFin);
+  let n=0;
+  ARCHIVE_DAYS.forEach(([k,ty,deb,fin,pz,fer])=>{
+    const d={t:ty,p:[]};
+    if(ty==='T'){
+      if(deb)d.deb=deb;
+      if(fin)d.fin=fin;
+      const a=P(deb),z=P(fin);
+      pz.forEach(([pd2,pf2,pty])=>{
+        const ok=a!=null&&z!=null&&a<=pd&&z>=pf;
+        d.p.push({d:pd2,f:pf2,ty:pty});
+      });
+      if(fer||isFerie(k))d.fer=true;
+    }
+    DB.days[k]=d;n++;
+  });
+  // Charger les périodes
+  ARCHIVE_PERIODS.forEach(p=>{
+    if(!DB.periods.some(x=>x.start===p.start))DB.periods.push({...p});
+    else DB.periods.find(x=>x.start===p.start).nb=p.nb;
+  });
+  DB.periods.sort((a,b)=>a.start<b.start?-1:1);
+  // Initialiser les bulletins manquants
+  ARCHIVE_PERIODS.forEach(p=>gb(p.start));
+  // Ancrage = début de l'archive
+  DB.s.anchor='2025-05-19';
+  DB.per={start:'2025-05-19',nb:1};
+  save();
+  curDate='2026-09-05';curMonth='2026-09';
+  renderAll();
+  alert('✅ Archive chargée : '+n+' journées · '+ARCHIVE_PERIODS.length+' périodes.');
+}
+
 /* ---------- calcul ---------- */
 function cd(k){
 const d=DB.days[k],S=DB.s;
@@ -481,7 +924,12 @@ $('rBk').innerHTML=DB.exp?'Dernier export : <b>'+DB.exp+'</b>':'<span style="col
 }
 function renderAll(){if(curTab==='jour')renderDay();if(curTab==='mois')renderMonth();
 if(curTab==='paie')renderPay();if(curTab==='audit')renderAudit();if(curTab==='reg')renderReg()}
+
 /* ---------- import PDF AmbuTrack (fichier direct) ---------- */
+// Worker URL en constante pour éviter la répétition
+const PDF_WORKER_SRC='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.worker.min.js';
+let _pdfWorkerSet=false; // flag pour ne configurer le worker qu'une seule fois
+
 function parsePdfFile(file){
 const out=$('impOut');
 if(!file)return;
@@ -490,7 +938,7 @@ if(!pdfjsLib){
 out.innerHTML='<div class="al b">❌ L\'outil de lecture PDF ne s\'est pas chargé (pas de connexion internet au premier lancement de la page ?). Recharge la page une fois en ligne, ou utilise le copier-coller ci-dessous.</div>';
 return;
 }
-pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.worker.min.js';
+if(!_pdfWorkerSet){pdfjsLib.GlobalWorkerOptions.workerSrc=PDF_WORKER_SRC;_pdfWorkerSet=true;}
 out.innerHTML='<div class="al i">⏳ Lecture du PDF…</div>';
 const reader=new FileReader();
 reader.onload=async function(e){
@@ -527,13 +975,19 @@ reader.onerror=()=>{out.innerHTML='<div class="al b">❌ Fichier illisible.</div
 reader.readAsArrayBuffer(file);
 fpdf.value='';
 }
-/* ---------- import PDF AmbuTrack ---------- */
+/* ---------- import PDF AmbuTrack (texte) ---------- */
+// Regex compilées une seule fois (optimisation : évite recompilation à chaque appel)
+const RX_PER=/P[ée]riode du (\d{1,2})\/(\d{1,2})\/(\d{4}) au (\d{1,2})\/(\d{1,2})\/(\d{4})/gi;
+const RX_DAY=/(\d{1,2}) (Lun|Mar|Mer|Jeu|Ven|Sam|Dim) ((?:(?!\d{1,2} (?:Lun|Mar|Mer|Jeu|Ven|Sam|Dim) |Semaine \d|Total quatorzaine|DATE TYPE|Avertissement|P[ée]riode du).)*)/g;
+const RX_HOR=/(\d{1,2}:\d{2}) ?- ?(\d{1,2}:\d{2})/;
+const RX_PZ=/(\d{1,2}:\d{2})-(\d{1,2}:\d{2}) ?\([^)]*\b(ENT|EXT)\b[^)]*\)/g;
+
 function parsePDF(){
 const out=$('impOut'),raw=$('impTxt').value;
 if(!raw.trim()){out.innerHTML='<div class="al w">Colle d\'abord le texte du PDF.</div>';return}
 const t=raw.replace(/\u00a0/g,' ').replace(/[–—]/g,'-').replace(/\s+/g,' ').trim();
-const PER=/P[ée]riode du (\d{1,2})\/(\d{1,2})\/(\d{4}) au (\d{1,2})\/(\d{1,2})\/(\d{4})/gi;
-const marks=[...t.matchAll(PER)];
+RX_PER.lastIndex=0;
+const marks=[...t.matchAll(RX_PER)];
 if(!marks.length){out.innerHTML='<div class="al b">❌ Ligne « Période du … au … » introuvable. Copie bien tout le texte du PDF, page 1 comprise.</div>';return}
 let html='',tot=0,allFer=[];
 marks.forEach((m,i)=>{
@@ -555,8 +1009,8 @@ renderAll();
 }
 function parseBlock(b,st,en){
 const S=DB.s,pd=P(S.panDeb),pf=P(S.panFin);
-const RX=/(\d{1,2}) (Lun|Mar|Mer|Jeu|Ven|Sam|Dim) ((?:(?!\d{1,2} (?:Lun|Mar|Mer|Jeu|Ven|Sam|Dim) |Semaine \d|Total quatorzaine|DATE TYPE|Avertissement|P[ée]riode du).)*)/g;
-const rows=[...b.matchAll(RX)];
+RX_DAY.lastIndex=0;
+const rows=[...b.matchAll(RX_DAY)];
 const rep={T:0,REPOS:0,RC:0,CP:0,MAL:0},fer=[],warn=[];let ir=0,iru=0,cur=st,n=0;
 rows.forEach(r=>{
 const dn=+r[1];let g=0;
@@ -570,10 +1024,11 @@ else if(/CONG[EÉ]/i.test(txt))ty='CP';
 else if(/MALAD|ACCID|\bAT\b/i.test(txt))ty='MAL';
 const d={t:ty,p:[]};
 if(ty==='T'){
-const hh=txt.match(/(\d{1,2}:\d{2}) ?- ?(\d{1,2}:\d{2})/);
+const hh=txt.match(RX_HOR);
 if(hh){d.deb=hh[1];d.fin=hh[2]}else warn.push(short(k)+' horaires illisibles');
 const a=P(d.deb),z=P(d.fin);
-[...txt.matchAll(/(\d{1,2}:\d{2})-(\d{1,2}:\d{2}) ?\([^)]*\b(ENT|EXT)\b[^)]*\)/g)].forEach(p=>{
+RX_PZ.lastIndex=0;
+[...txt.matchAll(RX_PZ)].forEach(p=>{
 const ok=a!=null&&z!=null&&a<=pd&&z>=pf;
 if(ok){p[3]==='EXT'?ir++:iru++}
 d.p.push({d:p[1],f:p[2],ty:p[3]});
@@ -593,8 +1048,6 @@ DB.per={start:st,nb};
 return{n,rep,ir,iru,fer,warn};
 }
 /* ---------- import Excel AmbuTrack ---------- */
-/* Transforme une valeur de cellule (texte "2026-08-21", date Excel, ou texte "21/08/2026")
-   en la même clé de date "AAAA-MM-JJ" utilisée partout ailleurs dans l'appli. */
 function excelDate(v){
 if(v==null||v==='')return null;
 if(v instanceof Date)return isoOf(v);
@@ -713,44 +1166,16 @@ Q.forEach((o,i)=>{o.w.forEach((s,j)=>t+='Sem '+(j+1)+' ('+short(s.start)+') : TT
 t+='→ Quatorzaine '+(i+1)+' : '+F(o.seuil)+' — HS 25% '+F(o.h25)+' · HS 50% '+F(o.h50)+'\n'});
 t+='TOTAL : TTE '+F(G.tte)+' · amplitude '+F(G.amp)+' · '+G.trav+' jours · '+(G.ir+G.iru)+' paniers · IDAJ '+C2(G.idaj);
 navigator.clipboard.writeText(t).then(()=>alert('Résumé copié'),()=>prompt('Copie :',t))}
-/* ---------- exemple ---------- */
-function demo(){
-const pz=(d,f,ty)=>[{d,f,ty}];
-Object.assign(DB.days,{
-'2026-07-27':{t:'T',deb:'06:50',fin:'18:15',p:pz('12:30','13:00','EXT')},
-'2026-07-28':{t:'T',deb:'12:10',fin:'21:00',p:[]},
-'2026-07-29':{t:'T',deb:'10:00',fin:'17:45',p:pz('12:30','13:00','ENT')},
-'2026-07-30':{t:'T',deb:'07:00',fin:'16:00',p:pz('12:00','12:30','EXT')},
-'2026-07-31':{t:'T',deb:'07:45',fin:'16:45',p:pz('12:45','13:15','ENT')},
-'2026-08-01':{t:'T',deb:'06:30',fin:'13:00',p:[]},'2026-08-02':{t:'REPOS',p:[]},
-'2026-08-03':{t:'T',deb:'08:30',fin:'16:20',p:pz('11:15','11:45','EXT')},
-'2026-08-04':{t:'T',deb:'10:50',fin:'18:50',p:pz('13:15','13:45','ENT')},
-'2026-08-05':{t:'T',deb:'12:40',fin:'19:00',p:[]},
-'2026-08-06':{t:'T',deb:'09:00',fin:'17:40',p:pz('13:45','14:15','EXT')},
-'2026-08-07':{t:'T',deb:'14:00',fin:'18:20',p:[]},
-'2026-08-08':{t:'T',deb:'06:30',fin:'14:20',p:[]},'2026-08-09':{t:'REPOS',p:[]},
-'2026-08-10':{t:'T',deb:'07:50',fin:'18:50',p:pz('11:30','12:00','ENT')},
-'2026-08-11':{t:'T',deb:'07:15',fin:'19:15',p:pz('13:30','14:00','ENT')},
-'2026-08-12':{t:'T',deb:'08:00',fin:'16:10',p:pz('12:00','12:30','ENT')},
-'2026-08-13':{t:'T',deb:'07:00',fin:'18:00',p:pz('11:30','12:00','EXT')},
-'2026-08-14':{t:'T',deb:'08:45',fin:'14:00',p:pz('13:29','13:59','ENT')},
-'2026-08-15':{t:'T',deb:'06:30',fin:'14:20',p:[],fer:true,note:'Assomption — codé REPOS sur la fiche employeur'},
-'2026-08-16':{t:'REPOS',p:[]},
-'2026-08-17':{t:'T',deb:'08:45',fin:'19:00',p:pz('11:45','12:15','EXT')},
-'2026-08-18':{t:'T',deb:'07:40',fin:'20:20',p:pz('12:00','12:30','ENT')},
-'2026-08-19':{t:'T',deb:'09:20',fin:'19:20',p:pz('13:00','13:30','EXT')},
-'2026-08-20':{t:'T',deb:'05:40',fin:'17:40',p:pz('13:15','13:45','ENT')},
-'2026-08-21':{t:'RC',p:[]},'2026-08-22':{t:'REPOS',p:[]},'2026-08-23':{t:'REPOS',p:[]}});
-Object.assign(DB.cmp,{'2026-07-27':'50:30','2026-08-03':'41:30','2026-08-10':'44:55','2026-08-17':'42:55'});
-DB.per={start:'2026-07-27',nb:2};
-if(!DB.periods.some(p=>p.start==='2026-07-27'))DB.periods.push({start:'2026-07-27',nb:2});
-DB.bul['2026-07-27']={p25:15,p50:0,rcOld:104.52,rcAcq:32.99};
-curDate='2026-08-15';curMonth='2026-08';save();tab('paie');
-}
+
+/* ---------- init ---------- */
 load();
 curDate=today();curMonth=curDate.slice(0,7);
-if(!Object.keys(DB.days).length)demo();
-renderDay();renderReg();
+// Si aucune donnée présente → charger l'archive PDF automatiquement
+if(!Object.keys(DB.days).length){
+  loadArchive();
+}else{
+  renderDay();renderReg();
+}
 if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 </script>
 </body>
