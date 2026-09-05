@@ -1156,7 +1156,7 @@ function parseBulletin(){
 function afficherBulletin(bul){
   const S = DB.s;
   $('bulResultCard').style.display = '';
-  $('bulMois').textContent = bul.mois;
+  $('bulMois').textContent = bul.mois || '2026-08';
   const mKey = bul.mois;
   const romi = DB.romis.find(r => r.mois === mKey);
 
@@ -1167,44 +1167,60 @@ function afficherBulletin(bul){
     let cur = first;
     while(cur <= last){
       const r = cd(cur);
-      calcTTE += r.tte; calcIR += r.ir; calcIRU += r.iru; calcIDAJ += r.idaj; calcTrav += r.trav;
+      if(r){
+        calcTTE += r.tte || 0; 
+        calcIR += r.ir || 0; 
+        calcIRU += r.iru || 0; 
+        calcIDAJ += r.idaj || 0; 
+        calcTrav += r.trav || 0;
+      }
       cur = addD(cur,1);
     }
-    calcHab = calcTrav * S.hab;
+    calcHab = calcTrav * (S.hab || 0);
     const diffFirst = nDays(S.anchor,first);
     let qc = addD(S.anchor, Math.floor(diffFirst/14)*14);
     if(qc > first) qc = addD(qc,-14);
     while(qc <= last){
       const qEnd = addD(qc,13);
       if(qc <= last && qEnd >= first){
-        const o = calcPer(qc,1).Q[0];
-        const jOverlap = nDays(Math.max(qc,first), Math.min(qEnd,last)) + 1;
-        const ratio = jOverlap / 14;
-        calcH25 += o.h25 * ratio; calcH50 += o.h50 * ratio;
+        const perRes = calcPer(qc,1);
+        if(perRes && perRes.Q && perRes.Q[0]){
+          const o = perRes.Q[0];
+          const jOverlap = nDays(Math.max(qc,first), Math.min(qEnd,last)) + 1;
+          const ratio = jOverlap / 14;
+          calcH25 += (o.h25 || 0) * ratio; 
+          calcH50 += (o.h50 || 0) * ratio;
+        }
       }
       qc = addD(qc,14);
       if(nDays(first,qc) > 60) break;
     }
   }
 
+  const hNormCalc = Math.max((calcTTE - calcH25 - calcH50), 0) / 60;
+  const taux = S.taux || 14.02;
+  const habT = S.habT || 12.9688;
+  const brutCalc = (bul.hNorm || 0) * taux + ((calcH25/60) * taux * 1.25) + ((calcHab/60) * habT) + ((calcIDAJ/60) * taux);
+
   const rows = [];
   function addRow(label,bv,cv,unit){
-    if(bv == null || isNaN(bv)) return;
+    if(bv == null || isNaN(bv)) bv = 0;
+    if(cv == null || isNaN(cv)) cv = 0;
     const d = bv - cv;
     const ok = Math.abs(d) <= (unit==='€'?0.50:0.20);
     rows.push({label,bul:bv,calc:cv,diff:d,ok,unit});
   }
 
-  addRow('Heures normales', bul.hNorm, Math.max(calcTTE-calcH25-calcH50,0)/60, 'h');
+  addRow('Heures normales', bul.hNorm, hNormCalc, 'h');
   if(bul.hs25H != null) addRow('HS 25%', bul.hs25H, calcH25/60, 'h');
   if(bul.habH != null) addRow('Habillage', bul.habH, calcHab/60, 'h');
   if(bul.idajH != null) addRow('IDAJ', bul.idajH, calcIDAJ/60, 'h');
   if(bul.irN != null) addRow('Paniers IR', bul.irN, calcIR, 'repas');
   if(bul.iruN != null) addRow('Paniers IRU', bul.iruN, calcIRU, 'repas');
-  if(bul.brut != null) addRow('Salaire brut', bul.brut, bul.hNorm*S.taux+(calcH25/60*S.taux*1.25)+(calcHab/60*S.habT)+(calcIDAJ/60*S.taux), '€');
+  addRow('Salaire brut', bul.brut, brutCalc, '€');
 
   $('bulKpi').innerHTML = [
-    ['Mois',bul.mois], ['Net payé',EUR(bul.net)], ['Brut',EUR(bul.brut)], ['HS 25%',bul.hs25H?bul.hs25H.toFixed(2)+' h':'0.00 h']
+    ['Mois',bul.mois || '—'], ['Net payé',EUR(bul.net || 0)], ['Brut',EUR(bul.brut || 0)], ['HS 25%',bul.hs25H?bul.hs25H.toFixed(2)+' h':'0.00 h']
   ].map(x=>`<div class="kpi"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
 
   let tab = '<tr><th>Élément</th><th class="n">Bulletin</th><th class="n">Calculé</th><th class="n">Écart</th><th></th></tr>';
@@ -1221,6 +1237,7 @@ function afficherBulletin(bul){
   $('bulAl').innerHTML = al;
   $('bulOut').innerHTML = '<div class="al k">✅ Bulletin analysé avec succès.</div>';
 }
+
 
 function renderBulHist(){
   if(!DB.bulletins||!DB.bulletins.length){ $('bulHist').innerHTML = '<div class="al i">Aucun bulletin importé.</div>'; return; }
