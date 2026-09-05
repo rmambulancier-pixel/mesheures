@@ -743,6 +743,7 @@ function cd(k){
   const r={amp:0,tte:0,seuil:0,idaj:0,ir:0,iru:0,rc:0,fer:0,dim:0,trav:0,pz:0,nuit:0,al:[],deb:null,fin:null,t:d?d.t:null};
   if(!d)return r;
   const isDim=dowN(k)===0;
+  const isF=isFerie(k);
   if(d.t==='T'){
     const a=P(d.deb),b0=P(d.fin);
     if(a==null||b0==null){r.al.push({lvl:'b',m:'Horaires incomplets'});return r}
@@ -757,18 +758,114 @@ function cd(k){
     if(S.min&&r.tte<270)r.tte=270;
     r.seuil=r.tte; r.trav=1; r.deb=a; r.fin=b;
     r.idaj=Math.max(0,r.amp-S.idaj*60);
-    if(d.fer)r.fer=r.tte;
-    if(isDim)r.dim=1;
+    // Détection automatique du férié (si coché OU si date fériée officielle)
+    if(d.fer || isF) r.fer=r.tte;
+    if(isDim) r.dim=1;
     r.nuit=minutesNuit(a,b,S);
     if(r.amp>S.maxAmp*60)r.al.push({lvl:'b',m:'Amplitude '+F(r.amp)+' > '+S.maxAmp+'h réglementaires'});
     if(r.pz===0&&r.tte>=360)r.al.push({lvl:'w',m:'≥ 6h travaillées sans pause — 20 min dues (art. L3121-16)'});
-    if(isFerie(k)&&!d.fer)r.al.push({lvl:'w',m:'Jour férié travaillé — majoration 100 % non cochée'});
     if(r.tte>660)r.al.push({lvl:'w',m:'TTE > 11h — journée exceptionnellement longue'});
   }
   else if(d.t==='CP')r.seuil=S.cp;
   else if(d.t==='RC')r.rc=S.rc;
   return r;
 }
+
+function renderDay(){
+  const k=curDate,d=gd(k),r=cd(k);
+  const isF=isFerie(k),isD=dowN(k)===0;
+  $('dLbl').textContent=dow(k).toUpperCase()+' '+k.slice(8)+' '+MON[+k.slice(5,7)-1]+' '+k.slice(0,4)
+    +(isF?' ☀️ (Férié)':'')+(isD&&!isF?' 🔵':'')+(k===today()?' • auj.':'');
+  const TYPES={T:'Travail',REPOS:'Repos',RC:'RC',CP:'Congé',MAL:'Maladie'};
+  $('dType').innerHTML=Object.entries(TYPES).map(([x,l])=>
+    `<button class="${d.t===x?'on':''}" onclick="setD('t','${x}')">${l}</button>`).join('');
+  let h='';
+  if(d.t==='T'){
+    h=`<div class="g2">
+<div><label>Début</label><input type="time" value="${d.deb||''}" onchange="setD('deb',this.value)"></div>
+<div><label>Fin</label><input type="time" value="${d.fin||''}" onchange="setD('fin',this.value)"></div>
+</div>
+<div style="margin-top:11px"><label>Pauses repas</label>`;
+    d.p.forEach((p,i)=>h+=`<div class="pz"><div class="row">
+<input type="time" value="${p.d||''}" onchange="setP(${i},'d',this.value)" style="flex:1">
+<input type="time" value="${p.f||''}" onchange="setP(${i},'f',this.value)" style="flex:1">
+<button class="r" onclick="delP(${i})" style="padding:8px 11px">✕</button></div>
+<div class="row" style="margin-top:7px;align-items:center">
+<label style="margin:0;flex:1">Lieu du repas :</label>
+<select onchange="setP(${i},'ty',this.value)" style="flex:2">
+<option value="ENT"${p.ty==='ENT'?' selected':''}>Entreprise (IRU - 9,69 €)</option>
+<option value="EXT"${p.ty==='EXT'?' selected':''}>Extérieur (IR - 5,30 €)</option>
+</select></div></div>`);
+    h+=`<button class="g" onclick="addP()" style="width:100%">+ Ajouter une pause</button></div>
+<div style="margin-top:11px">
+<label style="text-transform:none;font-size:14px;color:var(--txt)">
+<input type="checkbox" ${d.fer||isF?'checked':''} onchange="setD('fer',this.checked)"> ☀️ Jour férié travaillé (100 %) ${isF?'<span class="tag ok">Auto</span>':''}
+</label></div>`;
+  }
+  $('dWork').innerHTML=h;
+  $('dNote').value=d.note||'';
+  $('dKpi').innerHTML=[
+    ['Amplitude',F(r.amp)],['TTE',F(r.tte)],['Pauses',F(r.pz)],
+    ['IDAJ',r.idaj?F(r.idaj):'—'],['Paniers',(r.ir+r.iru)||'—']
+  ].map(x=>`<div class="kpi"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
+  $('dAl').innerHTML=r.al.map(a=>`<div class="al ${a.lvl}">${a.m}</div>`).join('');
+  const diff=nDays(DB.s.anchor,k);
+  const qs=addD(DB.s.anchor,Math.floor(diff/14)*14);
+  const o=calcPer(qs,1).Q[0],N=DB.s.base*120,pc=Math.min(100,o.seuil/N*100);
+  const barCls=pc>=100?'bar bad':pc>=85?'bar warn':'bar';
+  $('dQuat').innerHTML=`<div class="mut">${short(qs)} → ${short(addD(qs,13))}</div>
+<div class="${barCls}"><i style="width:${pc.toFixed(1)}%"></i></div>
+<div class="row" style="justify-content:space-between">
+<span><b>${F(o.seuil)}</b> / ${F(N)}</span>
+<span class="mut">${o.seuil<N?'reste '+F(N-o.seuil)+' avant HS':'🔥 HS : '+F(o.h25)+' à 25% · '+F(o.h50)+' à 50%'}</span>
+</div>`;
+  renderProj(k,qs);
+  if(_undo)$('undoDesc').textContent=_undo.desc;
+}
+
+function renderMonth(){
+  $('mLbl').textContent=MON[+curMonth.slice(5,7)-1]+' '+curMonth.slice(0,4);
+  let h=['L','M','M','J','V','S','D','Σ'].map(x=>`<div class="h">${x}</div>`).join('');
+  let cur=mono(curMonth+'-01');
+  const G={amp:0,tte:0,trav:0,ir:0,iru:0,idaj:0,dim:0,fer:0};
+  const chartD=[];
+  for(let w=0;w<6;w++){
+    let wa=0,wt=0;
+    for(let i=0;i<7;i++){
+      const k=addD(cur,w*7+i),r=cd(k),out=k.slice(0,7)!==curMonth;
+      const hasErr=r.al.some(a=>a.lvl==='b');
+      const isF=isFerie(k);
+      if(!out){
+        wa+=r.amp;wt+=r.tte;
+        G.amp+=r.amp;G.tte+=r.tte;G.trav+=r.trav;
+        G.ir+=r.ir;G.iru+=r.iru;G.idaj+=r.idaj;
+        G.dim+=r.dim;
+        if(r.fer>0) G.fer+=r.fer;
+        if(r.tte>0) chartD.push({k, v:r.tte});
+      }
+      h+=`<div class="cel ${r.t||''} ${out?'off':''} ${k===today()?'now':''} ${hasErr&&!out?'err':''}"
+onclick="curDate='${k}';tab('jour')">
+<div class="d">${+k.slice(8)}${isF?'☀️':''}</div>
+<div class="v">${r.tte?F(r.tte):(r.t==='RC'?'RC':r.t==='CP'?'CP':r.t==='MAL'?'AM':'')}</div>
+</div>`;
+    }
+    h+=`<div class="rec">${wt?'<span style="font-size:9px">'+F(wa)+'</span><b>'+F(wt)+'</b>':''}</div>`;
+    if(addD(cur,w*7+7).slice(0,7)!==curMonth&&w>=3)break;
+  }
+  $('mCal').innerHTML=h;
+  $('mKpi').innerHTML=[
+    ['Amplitude',F(G.amp)],['TTE',F(G.tte)],['Jours trav.',G.trav],
+    ['Paniers',G.ir+G.iru],['Dimanches',G.dim],['Fériés trav.',G.fer?F(G.fer):'—']
+  ].map(x=>`<div class="kpi"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
+
+  // Graphique TTE proportionnel
+  const maxM=Math.max(...chartD.map(x=>x.v), 600); // base min 10h
+  $('mChart').innerHTML=chartD.map(x=>{
+    const hPct=Math.max(6, Math.min(100, (x.v / maxM) * 100)).toFixed(1);
+    return `<div class="bar-w"><div class="bv" style="height:${hPct}%" title="${short(x.k)} : ${F(x.v)}"></div><div class="bl">${+x.k.slice(8)}</div></div>`;
+  }).join('');
+}
+
 
 function calcPer(start,nb){
   const S=DB.s,Q=[],AL=[];
