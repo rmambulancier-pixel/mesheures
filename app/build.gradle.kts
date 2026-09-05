@@ -38,7 +38,4 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    
-    // Bibliothèque d'extraction de texte PDF native sans navigateur
-    implementation("com.tom-roush:pdfbox-android:2.0.27.0")
 }
