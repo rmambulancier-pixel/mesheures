@@ -1,15 +1,23 @@
-# MesHeures - Application Hybride (Ambulancier)
+# 🚑 MesHeures — Gestion & Suivi Paie Ambulancier
 
-Application de gestion, de suivi horaire et de contrôle de paie dédiée à l'activité d'ambulancier, combinant une interface Web ergonomique et un conteneur natif Android (WebView).
+> Application Web Progressive (PWA) dédiée au suivi des temps de travail, au calcul de la paie et au rapprochement des bulletins officiels pour le personnel ambulancier.
 
-## Architecture du Projet
+---
 
-* **`index.html`** : Cœur de l'application (Interface utilisateur, moteurs de calculs, parsing de fichiers ROMI1 et bulletins de paie, gestion du stockage local).
-* **`/app`** : Module natif Android pour l'encapsulation de l'interface en WebView avec gestion des accès aux fichiers et sélecteurs natifs.
-* **`manifest.json`** : Configuration pour la prise en charge en Progressive Web App (PWA).
+## 🌟 Fonctionnalités Principales
 
-## Fonctionnalités principales
+* 📅 **Suivi Quotidien & Mensuel** : Enregistrement des amplitudes, des temps de travail effectif (TTE), des pauses et des paniers (IR / IRU).
+* 📈 **Audit & Quatorzaines** : Calcul automatique des heures supplémentaires (25% / 50%), des repos compensateurs (RC) et projection de fin de période.
+* 📄 **Rapprochement Paie & ROMI1** : Analyse intelligente des fichiers PDF officiels (bulletins employeur et relevés ROMI1) pour neutraliser les écarts.
+* 📱 **Mode PWA (Progressive Web App)** : Installation directe sur l'écran d'accueil du smartphone, fonctionnement hors ligne et mises à jour instantanées.
 
-* Suivi journalier et mensuel des temps de travail (TTE, amplitudes, heures supplémentaires).
-* Importation et rapprochement automatique avec les données officielles (ROMI1 et Bulletins de paie).
-* Calculs sécurisés intégrant la gestion des paniers repas (IR, IRU), des indemnités (IDAJ) et des repos compensateurs.
+---
+
+## 📂 Structure du Projet (Pure PWA)
+
+```text
+📦 mesheures/
+┣ 📜 index.html        # Cœur de l'application (Interface, moteurs de calcul, parseurs PDF)
+┣ 📱 manifest.json     # Configuration de l'application mobile (PWA)
+┣ 🎨 icon.svg          # Identité visuelle vectorielle
+┗ 📖 README.md         # Documentation du projet
