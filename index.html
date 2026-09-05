@@ -841,12 +841,12 @@ function renderMonth(){
         G.amp+=r.amp;G.tte+=r.tte;G.trav+=r.trav;
         G.ir+=r.ir;G.iru+=r.iru;G.idaj+=r.idaj;
         G.dim+=r.dim;
-        if(r.fer>0) G.fer+=r.fer;
+        if(r.fer>0 || (isF && r.tte>0)) G.fer+=r.tte;
         if(r.tte>0) chartD.push({k, v:r.tte});
       }
       h+=`<div class="cel ${r.t||''} ${out?'off':''} ${k===today()?'now':''} ${hasErr&&!out?'err':''}"
 onclick="curDate='${k}';tab('jour')">
-<div class="d">${+k.slice(8)}${isF?'☀️':''}</div>
+<div class="d">${+k.slice(8)}${isF?' ☀️':''}</div>
 <div class="v">${r.tte?F(r.tte):(r.t==='RC'?'RC':r.t==='CP'?'CP':r.t==='MAL'?'AM':'')}</div>
 </div>`;
     }
@@ -858,6 +858,13 @@ onclick="curDate='${k}';tab('jour')">
     ['Amplitude',F(G.amp)],['TTE',F(G.tte)],['Jours trav.',G.trav],
     ['Paniers',G.ir+G.iru],['Dimanches',G.dim],['Fériés trav.',G.fer?F(G.fer):'—']
   ].map(x=>`<div class="kpi"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
+
+  const maxVal = Math.max(...chartD.map(x=>x.v), 660);
+  $('mChart').innerHTML=chartD.map(x=>{
+    const pct = Math.max(8, Math.round((x.v / maxVal) * 70));
+    return `<div class="bar-w"><div class="bv" style="height:${pct}px" title="${short(x.k)} : ${F(x.v)}"></div><div class="bl">${+x.k.slice(8)}</div></div>`;
+  }).join('');
+}
 
   // Graphique TTE proportionnel
   const maxM=Math.max(...chartD.map(x=>x.v), 600); // base min 10h
