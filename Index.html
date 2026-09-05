@@ -979,11 +979,12 @@ onclick="curDate='${k}';tab('jour')">
     ['Amplitude',F(G.amp)],['TTE',F(G.tte)],['Jours trav.',G.trav],
     ['Paniers',G.ir+G.iru],['Dimanches',G.dim],['Fériés trav.',G.fer?'oui':'—']
   ].map(x=>`<div class="kpi"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
-  const max=Math.max(...chartD.map(x=>x.v),1);
-  $('mChart').innerHTML=chartD.map(x=>{
-    const pct=(x.v/max*100).toFixed(1);
+    const max = Math.max(...chartD.map(x => x.v), 1);
+  $('mChart').innerHTML = chartD.map(x => {
+    const pct = Math.max(5, (x.v / (14 * 60) * 100)).toFixed(1); // basé sur un max de 14h
     return `<div class="bar-w"><div class="bv" style="height:${pct}%"></div><div class="bl">${+x.k.slice(8)}</div></div>`;
   }).join('');
+
 }
 
 function goPer(n){DB.per.start=addD(DB.per.start,n*14*DB.per.nb);save();renderPay()}
