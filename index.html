@@ -12,13 +12,12 @@
 <style>
 :root{--bg:#0d1117;--card:#161b22;--line:#30363d;--txt:#e6edf3;--dim:#8b949e;--ok:#3fb950;--warn:#d29922;--bad:#f85149;--acc:#238636;--blue:#58a6ff;--pur:#bc8cff;--ora:#f0883e}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.45 system-ui,-apple-system,sans-serif;padding-bottom:85px}
-header{position:sticky;top:0;z-index:20;background:#0d1117f2;backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:10px 12px}
+body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.45 system-ui,-apple-system,sans-serif;padding-bottom:80px}
+header{position:sticky;top:0;z-index:20;background:#0d1117ee;backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:10px 12px}
 h1{font-size:17px;margin:0;display:flex;align-items:center;gap:8px}
 .badge{background:var(--bad);color:#fff;font-size:10px;border-radius:9px;padding:1px 6px;font-weight:700}
-.tabs{display:flex;gap:4px;margin-top:9px;overflow-x:auto;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
-.tabs button{flex:1;min-width:58px;background:#21262d;border:1px solid var(--line);color:var(--dim);border-radius:8px;padding:7px 2px;font-size:11px;font-weight:600;position:relative;cursor:pointer}
+.tabs{display:flex;gap:4px;margin-top:9px;overflow-x:auto}
+.tabs button{flex:1;min-width:60px;background:#21262d;border:1px solid var(--line);color:var(--dim);border-radius:8px;padding:7px 2px;font-size:11px;font-weight:600;position:relative}
 .tabs button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
 .tabs button .tb{position:absolute;top:-4px;right:-2px;background:var(--bad);color:#fff;font-size:9px;border-radius:7px;padding:0 4px;font-weight:700}
 main{padding:12px;max-width:860px;margin:0 auto}
@@ -32,6 +31,7 @@ input[type=checkbox]{width:20px;height:20px;vertical-align:-4px}
 textarea{font-size:12px;font-family:ui-monospace,monospace}
 .grid{display:grid;gap:9px;grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
 .g2{display:grid;gap:9px;grid-template-columns:1fr 1fr}
+.g3{display:grid;gap:9px;grid-template-columns:1fr 1fr 1fr}
 button{background:var(--acc);color:#fff;border:0;border-radius:9px;padding:10px 13px;font-size:14px;font-weight:600;cursor:pointer}
 button.g{background:#21262d;border:1px solid var(--line);color:var(--txt)}
 button.r{background:#3d1a1c;border:1px solid #6e2427;color:#ff9b96}
@@ -52,7 +52,7 @@ tr.q{background:#0f2d1a}tr.q td{color:var(--ok);font-weight:700}
 tr.t{background:#1c2128}tr.t td{font-weight:700}
 .kpis{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(88px,1fr))}
 .kpi{background:#0d1117;border:1px solid var(--line);border-radius:9px;padding:9px 4px;text-align:center;cursor:default}
-.kpi b{display:block;font-size:15px;color:var(--ok);font-variant-numeric:tabular-nums}
+.kpi b{display:block;font-size:16px;color:var(--ok);font-variant-numeric:tabular-nums}
 .kpi span{font-size:10px;color:var(--dim)}
 .kpi.warn b{color:var(--warn)}.kpi.bad b{color:var(--bad)}
 .al{padding:8px 10px;border-radius:7px;margin-bottom:6px;font-size:13px;line-height:1.4}
@@ -63,27 +63,38 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 .al.p{background:#1e1230;border-left:3px solid var(--pur)}
 .cal{display:grid;grid-template-columns:repeat(7,1fr) 44px;gap:3px}
 .cal .h{font-size:10px;color:var(--dim);text-align:center;padding:3px 0}
-.cel{background:#0d1117;border:1px solid var(--line);border-radius:7px;padding:4px 1px;min-height:52px;text-align:center;cursor:pointer}
+.cel{background:#0d1117;border:1px solid var(--line);border-radius:7px;padding:4px 1px;min-height:52px;text-align:center;cursor:pointer;transition:opacity .15s}
+.cel:active{opacity:.7}
 .cel .d{font-size:11px;color:var(--dim)}
 .cel .v{font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.cel .ic{font-size:9px;line-height:1.2}
 .cel.T{background:#0f2d1a;border-color:#1d5c33}.cel.T .v{color:var(--ok)}
 .cel.RC{background:#1a1f4d;border-color:#33409e}.cel.RC .v{color:#8b9bff}
 .cel.CP{background:#3d3312;border-color:#7a6620}.cel.CP .v{color:var(--warn)}
 .cel.MAL{background:#3d1a1c;border-color:#6e2427}.cel.MAL .v{color:#ff9b96}
+.cel.NUIT{background:#1a0d3d;border-color:#3d1a7a}.cel.NUIT .v{color:var(--pur)}
 .cel.off{opacity:.3}.cel.now{outline:2px solid var(--ok)}
+.cel.err{outline:2px solid var(--bad)}
 .rec{background:#1c2128;border:1px solid var(--line);border-radius:7px;font-size:10px;padding:4px 1px;text-align:center;color:var(--dim);line-height:1.25}
 .rec b{display:block;color:var(--ok);font-size:11px}
 .pz{background:#0d1117;border:1px solid var(--line);border-radius:9px;padding:9px;margin-bottom:7px}
 .bar{height:7px;background:#21262d;border-radius:4px;overflow:hidden;margin:7px 0}
 .bar i{display:block;height:100%;background:var(--ok);transition:width .3s}
+.bar.warn i{background:var(--warn)}.bar.bad i{background:var(--bad)}
 .mut{color:var(--dim);font-size:12px}
 .fab{position:fixed;bottom:0;left:0;right:0;background:#0d1117ee;backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:9px 12px;display:flex;gap:8px;z-index:30}
 .fab button{flex:1;font-size:13px}
 .chart{display:flex;align-items:flex-end;gap:3px;height:80px;margin:9px 0}
 .chart .bar-w{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px}
 .chart .bar-w .bv{background:var(--acc);border-radius:3px 3px 0 0;width:100%;min-height:2px}
+.chart .bar-w .bv.hs{background:var(--warn)}
 .chart .bar-w .bl{font-size:8px;color:var(--dim)}
-@media print{.tabs,.fab,header,button,textarea{display:none!important}section{display:block!important}body{background:#fff;color:#000;padding:0}.card{border:1px solid #ccc;background:#fff;page-break-inside:avoid}h2,.kpi b{color:#000}}
+.modal-bg{display:none;position:fixed;inset:0;background:#0009;z-index:50;justify-content:center;align-items:flex-end}
+.modal-bg.on{display:flex}
+.modal{background:var(--card);border:1px solid var(--line);border-radius:16px 16px 0 0;padding:18px;width:100%;max-width:600px;max-height:80vh;overflow-y:auto}
+.modal h3{margin:0 0 12px;font-size:16px}
+@media(min-width:600px){.modal{border-radius:16px;margin:auto}}
+@media print{.tabs,.fab,header,button,textarea,.modal-bg{display:none!important}section{display:block!important}body{background:#fff;color:#000;padding:0}.card{border:1px solid #ccc;background:#fff;page-break-inside:avoid}h2,.kpi b{color:#000}}
 </style>
 </head>
 <body>
@@ -115,8 +126,10 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 </div>
 <div class="card"><h2>Résumé du jour</h2><div class="kpis" id="dKpi"></div><div id="dAl" style="margin-top:10px"></div></div>
 <div class="card"><h2>Quatorzaine en cours</h2><div id="dQuat"></div></div>
+<div class="card"><h2>Projection fin de période <span class="sub" id="dProjLbl"></span></h2><div id="dProj"></div></div>
 <div class="fab">
 <button class="g" onclick="goToday()">📅 Aujourd'hui</button>
+<button class="g" onclick="dupliConfirm()">📋 Copier veille</button>
 <button class="g" onclick="window.print()">🖨️ Imprimer</button>
 </div>
 </section>
@@ -128,7 +141,7 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 <button class="g" onclick="goMonth(1)">›</button>
 </div>
 <div class="card"><div class="cal" id="mCal"></div>
-<div class="mut" style="margin-top:9px">Touche un jour pour modifier · Σ : amplitude / TTE</div></div>
+<div class="mut" style="margin-top:9px">Touche un jour pour le modifier · colonne Σ : amplitude / TTE</div></div>
 <div class="card"><h2>Total du mois</h2><div class="kpis" id="mKpi"></div></div>
 <div class="card"><h2>Graphique TTE journalier</h2><div class="chart" id="mChart"></div></div>
 <div class="card"><h2>Dimanches & fériés travaillés</h2><div id="mDim"></div></div>
@@ -151,7 +164,11 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 <div class="card"><h2>KPIs</h2><div class="kpis" id="pKpi"></div></div>
 <div class="card"><h2>Détail quatorzaines</h2><div style="overflow-x:auto"><table id="pTab"></table></div></div>
 <div class="card"><h2>Anomalies <span class="sub" id="pAlCount"></span></h2><div id="pAl"></div></div>
-<div class="card"><h2>Brut estimé</h2><div style="overflow-x:auto"><table id="pBrut"></table></div></div>
+<div class="card"><h2>Brut estimé</h2><div style="overflow-x:auto"><table id="pBrut"></table></div>
+<div class="g2" style="margin-top:9px">
+<button class="g" onclick="copySum()">📋 Copier résumé</button>
+<button class="g" onclick="window.print()">🖨️ Imprimer</button>
+</div></div>
 <div class="card"><h2>Repos compensateur</h2>
 <div class="g2">
 <div><label>HS 25 % payées (h)</label><input type="number" step="0.01" id="pP25" onchange="setBul('p25',+this.value)"></div>
@@ -162,23 +179,26 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 <div><label>RC bulletin (h)</label><input type="number" step="0.01" id="pRCA" onchange="setBul('rcAcq',+this.value)"></div>
 </div>
 <div id="pRcOut" style="margin-top:9px"></div></div>
+<div class="card"><h2>Comparaison TTE bulletin</h2><div style="overflow-x:auto"><table id="pCmp"></table></div></div>
 </section>
 
 <section id="s-audit">
 <div class="card"><h2>Vue globale</h2><div class="kpis" id="aKpi"></div></div>
 <div class="card"><h2>Résumé annuel</h2><div style="overflow-x:auto"><table id="aAnn"></table></div></div>
 <div class="card"><h2>Périodes enregistrées</h2><div style="overflow-x:auto"><table id="aTab"></table></div></div>
+<div class="card"><h2>Dimanches & fériés travaillés</h2><div id="aFer"></div></div>
 <div class="card"><h2>Solde RC cumulé</h2><div id="aRc"></div></div>
+<div class="card"><h2>Anomalies critiques</h2><div id="aAl"></div></div>
 </section>
 
 <section id="s-bul">
 <div class="card">
 <h2>📄 Importer un bulletin de paie employeur</h2>
-<div class="al i" style="margin-bottom:10px">Importe le bulletin PDF officiel. Les pourcentages (25 %, 50 %, 100 %) sont nettoyés pour éviter tout décalage d'indices.</div>
+<div class="al i" style="margin-bottom:10px">Importe le bulletin PDF officiel. Le parseur filtre automatiquement les pourcentages parasites pour éviter tout décalage d'indices.</div>
 <div style="margin-bottom:9px"><label>Fichier PDF bulletin de paie</label>
 <input type="file" accept=".pdf,application/pdf" id="fbul" onchange="parseBulFile(this.files[0])"></div>
-<label>ou coller le texte extrait</label>
-<textarea id="bulTxt" rows="5" placeholder="Colle le texte du bulletin PDF…"></textarea>
+<label>ou coller le texte extrait ici</label>
+<textarea id="bulTxt" rows="5" placeholder="Colle le texte copié depuis le bulletin PDF…"></textarea>
 <button onclick="parseBulletin()" style="margin-top:7px;width:100%">🔍 Analyser le bulletin</button>
 <div id="bulOut" style="margin-top:9px"></div>
 </div>
@@ -197,11 +217,11 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 <section id="s-romi">
 <div class="card">
 <h2>📑 Relevé Officiel Mensuel (ROMI1)</h2>
-<div class="al i">Le ROMI1 est le décompte officiel édité par l'employeur. Sélectionne directement le PDF pour confrontation automatique.</div>
+<div class="al i">Le ROMI1 est le décompte officiel édité par l'employeur. Sélectionne directement le PDF pour le confronter au bulletin de paie.</div>
 <div style="margin-bottom:9px"><label>Fichier PDF ROMI1</label>
 <input type="file" accept=".pdf,application/pdf" id="from" onchange="parseRomiFile(this.files[0])"></div>
-<label>ou coller le texte extrait du ROMI1</label>
-<textarea id="romTxt" rows="5" placeholder="Colle le texte du ROMI1 ici si besoin…"></textarea>
+<label>ou coller le texte extrait</label>
+<textarea id="romTxt" rows="5" placeholder="Colle ici le texte copié depuis le PDF ROMI1…"></textarea>
 <button onclick="parseROMI()" style="margin-top:7px;width:100%">📊 Traiter le relevé ROMI1</button>
 <div id="romOut" style="margin-top:9px"></div>
 </div>
@@ -229,9 +249,24 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 </div>
 </div>
 <div class="card"><h2>Tarifs</h2><div class="grid" id="rg1"></div></div>
-<div class="card"><h2>Quatorzaines & durées</h2><div class="grid" id="rg2"></div></div>
+<div class="card"><h2>Quatorzaines & durées</h2>
+<div class="grid" id="rg2"></div>
+<div style="margin-top:9px"><label style="text-transform:none;font-size:14px;color:var(--txt)"><input type="checkbox" id="rMin" onchange="DB.s.min=this.checked;save();renderAll()"> TTE minimale 4h30 (si contrat)</label></div>
+</div>
 <div class="card"><h2>Paniers & habillage</h2><div class="grid" id="rg3"></div></div>
+<div class="card"><h2>Import AmbuTrack — PDF</h2>
+<div style="margin-bottom:8px"><label>Fichier PDF AmbuTrack</label>
+<input type="file" accept=".pdf,application/pdf" id="fpdf" onchange="parsePdfFile(this.files[0])"></div>
+<label>ou coller le texte ici</label>
+<textarea id="impTxt" rows="5" placeholder="Colle ici le texte copié depuis le PDF AmbuTrack…"></textarea>
+<button onclick="parsePDF()" style="margin-top:7px;width:100%">Importer le texte</button>
+<div id="impOut" style="margin-top:9px"></div>
+</div>
+<div class="card"><h2>Import AmbuTrack — Excel</h2>
+<input type="file" accept=".xlsx,.xls" id="fx" onchange="parseExcel(this.files[0])">
+</div>
 <div class="card"><h2>Sauvegarde JSON</h2>
+<div id="rBk" style="margin-bottom:9px"></div>
 <div class="row">
 <button class="g" onclick="expo()">⬇ Exporter</button>
 <button class="g" onclick="$('impJ').click()">⬆ Importer JSON</button>
@@ -239,8 +274,23 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 <button class="r" onclick="wipe()">🗑 Effacer tout</button>
 </div>
 </div>
+<div class="card"><h2>Archive PDF pré-chargée</h2>
+<div class="al i">📦 <b>Mickael Roth — Ambulance de l'uby</b><br>19/05/2025 → 06/09/2026</div>
+<button class="g" onclick="loadArchive()" style="margin-top:8px;width:100%">🔄 Recharger l'archive</button>
+</div>
 </section>
 </main>
+
+<div class="modal-bg" id="undoModal">
+<div class="modal">
+<h3>↩️ Annuler la dernière action ?</h3>
+<div id="undoDesc" style="margin-bottom:14px;color:var(--dim);font-size:13px"></div>
+<div class="row">
+<button onclick="doUndo()">Annuler l'action</button>
+<button class="g" onclick="closeModal('undoModal')">Garder</button>
+</div>
+</div>
+</div>
 
 <script>
 const LS='mesheures_v3';
@@ -260,6 +310,7 @@ const DEF={
 };
 let DB={s:{...DEF},days:{},cmp:{},periods:[],bul:{},bulletins:[],romis:[],per:{start:'2025-05-19',nb:1},exp:null};
 let curDate,curMonth,curTab='jour';
+let _undo=null;
 
 const $=i=>document.getElementById(i);
 const pad=n=>String(n).padStart(2,'0');
@@ -280,6 +331,24 @@ const EUR=n=>typeof n==='number'?n.toFixed(2).replace('.',',')+' €':'—';
 const short=s=>s.slice(8)+'/'+s.slice(5,7);
 const shortY=s=>s.slice(8)+'/'+s.slice(5,7)+'/'+s.slice(2,4);
 const esc=s=>s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):'';
+
+function easterOf(y){
+  const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,
+  f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,
+  i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,
+  m=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*m+114)/31),
+  da=((h+l-7*m+114)%31)+1;
+  return new Date(y,mo-1,da,12);
+}
+const FC={};
+function feriesY(y){
+  if(FC[y])return FC[y];
+  const s=new Set([y+'-01-01',y+'-05-01',y+'-05-08',y+'-07-14',y+'-08-15',y+'-11-01',y+'-11-11',y+'-12-25']);
+  const e=easterOf(y);
+  [1,39,50].forEach(n=>{const d=new Date(e);d.setDate(d.getDate()+n);s.add(isoOf(d))});
+  return FC[y]=s;
+}
+const isFerie=k=>feriesY(+k.slice(0,4)).has(k);
 
 function calcAnc(emb){
   if(!emb)return{y:0,m:0,pct:0};
@@ -302,7 +371,8 @@ function normalizeMoisKey(str){
 }
 
 function save(){
-  try{localStorage.setItem(LS,JSON.stringify(DB))}catch(e){}
+  try{localStorage.setItem(LS,JSON.stringify(DB))}
+  catch(e){alert('Stockage saturé : exportez vos données !\n'+e.message)}
 }
 function load(){
   try{
@@ -345,6 +415,310 @@ function gb(s){
 }
 function setBul(f,v){gb(DB.per.start)[f]=v;save();renderPay()}
 
+function pushUndo(desc){
+  _undo={days:JSON.stringify(DB.days),periods:JSON.stringify(DB.periods),desc};
+}
+function doUndo(){
+  if(!_undo)return;
+  DB.days=JSON.parse(_undo.days);
+  DB.periods=JSON.parse(_undo.periods);
+  _undo=null;save();renderAll();
+  closeModal('undoModal');
+}
+function closeModal(id){$(id).classList.remove('on')}
+
+const AD=[
+['2025-05-19','T','08:00','20:00',[],0],['2025-05-21','T','08:00','20:00',[],0],
+['2025-05-23','T','07:20','18:30',[['12:55','13:25','ENT']],0],
+['2025-05-26','T','05:40','12:50',[],0],['2025-05-27','T','07:20','19:30',[['13:25','13:55','ENT']],0],
+['2025-05-28','T','09:00','19:30',[['14:15','14:45','ENT']],0],
+['2025-05-29','T','08:00','15:00',[],0],['2025-05-30','T','11:00','17:40',[],0],
+['2025-06-02','T','11:45','20:35',[],0],['2025-06-03','T','06:45','17:40',[['12:12','12:42','ENT']],0],
+['2025-06-04','T','09:15','18:50',[['14:02','14:32','ENT']],0],
+['2025-06-05','T','09:50','18:15',[['14:02','14:32','ENT']],0],
+['2025-06-06','T','05:40','16:20',[['11:00','11:30','ENT']],0],
+['2025-06-09','T','07:00','14:00',[],0],['2025-06-10','T','07:00','17:40',[['12:20','12:50','ENT']],0],
+['2025-06-11','T','10:50','19:40',[['15:15','15:45','ENT']],0],
+['2025-06-12','T','08:30','18:00',[['13:15','13:45','ENT']],0],
+['2025-06-13','T','07:00','18:00',[['12:30','13:00','ENT']],0],
+['2025-06-16','T','07:40','17:30',[['12:35','13:05','ENT']],0],
+['2025-06-17','T','07:30','19:10',[['13:20','13:50','ENT']],0],
+['2025-06-18','T','07:20','16:00',[['11:40','12:10','ENT']],0],
+['2025-06-19','T','09:15','18:20',[['13:47','14:17','ENT']],0],
+['2025-06-20','T','04:30','14:50',[['09:40','10:10','ENT']],0],
+['2025-06-23','T','07:20','17:30',[['12:25','12:55','ENT']],0],
+['2025-06-24','T','11:45','18:10',[],0],['2025-06-25','T','07:15','13:00',[],0],
+['2025-06-26','T','09:20','19:30',[['14:25','14:55','ENT']],0],
+['2025-06-27','T','07:30','13:50',[],0],
+['2025-06-30','T','11:45','20:10',[],0],['2025-07-01','T','09:30','19:20',[['14:25','14:55','ENT']],0],
+['2025-07-02','T','06:50','17:50',[['12:20','12:50','ENT']],0],
+['2025-07-03','T','13:30','21:00',[],0],['2025-07-04','T','09:50','19:00',[['14:25','14:55','ENT']],0],
+['2025-07-07','T','09:40','20:00',[['14:50','15:20','ENT']],0],
+['2025-07-08','T','14:30','19:30',[],0],['2025-07-09','T','06:00','17:00',[['11:30','12:00','ENT']],0],
+['2025-10-10','T','09:00','19:30',[['14:15','14:45','ENT']],0],
+['2025-07-11','T','08:30','18:10',[['13:20','13:50','ENT']],0],
+['2025-07-25','T','13:20','19:20',[],0],
+['2025-07-28','T','09:20','17:50',[['13:35','14:05','ENT']],0],
+['2025-07-29','T','06:30','18:15',[['12:22','12:52','ENT']],0],
+['2025-07-30','T','06:45','13:00',[],0],['2025-07-31','T','06:30','18:20',[['12:25','12:55','ENT']],0],
+['2025-08-01','T','06:30','17:00',[['11:45','12:15','ENT']],0],
+['2025-08-04','T','09:30','18:50',[['14:10','14:40','ENT']],0],
+['2025-08-05','T','07:45','13:35',[],0],['2025-08-06','T','09:40','16:15',[['12:57','13:27','ENT']],0],
+['2025-08-07','T','06:15','14:35',[],0],
+['2025-08-11','T','07:00','14:00',[],0],['2025-08-12','T','06:50','15:20',[['11:05','11:35','ENT']],0],
+['2025-08-13','T','07:00','16:00',[['11:30','12:00','ENT']],0],
+['2025-08-14','T','12:20','19:30',[],0],['2025-08-15','T','07:00','17:45',[['12:22','12:52','ENT']],1],
+['2025-08-18','T','07:00','17:00',[['12:00','12:30','ENT']],0],
+['2025-08-19','T','07:45','20:10',[['13:57','14:27','ENT']],0],
+['2025-08-20','T','08:00','17:05',[['12:32','13:02','ENT']],0],
+['2025-08-21','T','06:30','18:10',[['12:20','12:50','ENT']],0],
+['2025-08-22','T','07:45','18:30',[['13:07','13:37','ENT']],0],
+['2025-08-25','T','06:45','16:00',[['11:22','11:52','ENT']],0],
+['2025-08-26','T','08:15','18:30',[['13:22','13:52','ENT']],0],
+['2025-08-27','T','08:45','17:15',[['13:00','13:30','ENT']],0],
+['2025-08-28','T','07:00','18:15',[['12:37','13:07','ENT']],0],
+['2025-08-29','T','10:15','18:20',[['14:17','14:47','ENT']],0],
+['2025-09-01','T','11:45','19:30',[],0],['2025-09-02','T','07:30','18:30',[['13:00','13:30','ENT']],0],
+['2025-09-03','T','06:50','16:20',[['11:35','12:05','ENT']],0],
+['2025-09-04','T','06:30','16:20',[['11:25','11:55','ENT']],0],
+['2025-09-05','T','07:40','16:05',[['11:52','12:22','ENT']],0],
+['2025-09-08','T','09:50','18:10',[['14:00','14:30','ENT']],0],
+['2025-09-09','T','07:30','18:00',[['12:45','13:15','ENT']],0],
+['2025-09-10','T','06:20','17:40',[['12:00','12:30','ENT']],0],
+['2025-09-11','T','10:30','16:30',[['13:30','14:00','ENT']],0],
+['2025-09-12','T','06:15','19:00',[['12:37','13:07','ENT']],0],
+['2025-09-15','T','10:15','17:20',[['13:47','14:17','ENT']],0],
+['2025-09-16','T','06:15','17:00',[['11:37','12:07','ENT']],0],
+['2025-09-18','T','06:40','18:20',[['12:30','13:00','ENT']],0],
+['2025-09-19','T','07:20','17:40',[['12:30','13:00','ENT']],0],
+['2025-09-22','T','13:30','20:30',[],0],['2025-09-23','T','11:20','21:20',[],0],
+['2025-09-24','T','09:00','19:00',[['14:00','14:30','ENT']],0],
+['2025-09-25','T','06:40','18:00',[['12:20','12:50','ENT']],0],
+['2025-09-26','T','11:20','19:40',[],0],
+['2025-09-29','T','09:15','20:20',[['14:47','15:17','ENT']],0],
+['2025-09-30','T','08:20','18:45',[['13:32','14:02','ENT']],0],
+['2025-10-01','T','09:00','18:30',[['13:45','14:15','ENT']],0],
+['2025-10-02','T','06:40','15:20',[['11:00','11:30','ENT']],0],
+['2025-10-03','T','07:30','17:30',[['12:30','13:00','ENT']],0],
+['2025-10-06','T','07:15','13:00',[],0],['2025-10-07','T','07:45','17:50',[['12:47','13:17','ENT']],0],
+['2025-10-08','T','06:50','18:00',[['12:25','12:55','ENT']],0],
+['2025-10-09','T','07:30','19:00',[['13:15','13:45','ENT']],0],
+['2025-10-10','T','07:40','18:30',[['13:05','13:35','ENT']],0],
+['2025-10-13','T','05:20','19:00',[['12:10','12:40','ENT']],0],
+['2025-10-14','T','13:20','19:40',[],0],['2025-10-15','T','08:00','18:20',[['13:10','13:40','ENT']],0],
+['2025-10-16','T','09:10','19:50',[['14:30','15:00','ENT']],0],
+['2025-10-17','T','08:15','19:50',[['14:02','14:32','ENT']],0],
+['2025-10-20','T','09:20','19:00',[['14:10','14:40','ENT']],0],
+['2025-10-21','T','06:40','17:30',[['12:05','12:35','ENT']],0],
+['2025-10-22','T','06:45','17:45',[['12:15','12:45','ENT']],0],
+['2025-10-23','T','06:00','14:20',[['10:10','10:40','ENT']],0],
+['2025-10-24','T','07:30','15:20',[['11:25','11:55','ENT']],0],
+['2025-10-29','T','09:00','19:00',[['14:00','14:30','ENT']],0],
+['2025-10-30','T','08:45','19:00',[['13:52','14:22','ENT']],0],
+['2025-10-31','T','06:40','18:00',[['12:20','12:50','ENT']],0],
+['2025-11-03','T','09:40','20:00',[['14:50','15:20','ENT']],0],
+['2025-11-04','T','11:00','20:30',[],0],['2025-11-05','T','07:30','16:30',[['12:00','12:30','ENT']],0],
+['2025-11-06','T','12:00','20:20',[],0],['2025-11-07','T','08:00','17:00',[['12:30','13:00','ENT']],0],
+['2025-11-12','T','06:30','17:40',[['12:05','12:35','ENT']],0],
+['2025-11-13','T','06:40','19:00',[['12:50','13:20','ENT']],0],
+['2025-11-14','T','06:30','17:00',[['11:45','12:15','ENT']],0],
+['2025-11-17','T','06:45','17:30',[['12:07','12:37','ENT']],0],
+['2025-11-18','T','09:00','14:20',[['11:40','12:10','ENT']],0],
+['2025-11-19','T','09:30','19:50',[['14:40','15:10','ENT']],0],
+['2025-11-20','T','14:10','19:00',[],0],['2025-11-21','T','05:40','17:00',[['11:20','11:50','ENT']],0],
+['2025-11-24','T','06:40','18:40',[['12:40','13:10','ENT']],0],
+['2025-11-25','T','06:50','18:20',[['12:35','13:05','ENT']],0],
+['2025-11-26','T','06:20','14:00',[],0],['2025-11-27','T','06:50','17:30',[['12:10','12:40','ENT']],0],
+['2025-11-28','T','14:00','18:00',[],0],
+['2025-12-01','T','07:30','17:30',[['12:30','13:00','ENT']],0],
+['2025-12-02','T','07:15','17:00',[['12:07','12:37','ENT']],0],
+['2025-12-03','T','09:20','19:30',[['14:25','14:55','ENT']],0],
+['2025-12-04','T','08:30','18:30',[['13:30','14:00','ENT']],0],
+['2025-12-05','T','08:40','19:50',[['14:15','14:45','ENT']],0],
+['2025-12-08','T','07:40','17:20',[['12:30','13:00','ENT']],0],
+['2025-12-09','T','07:30','18:50',[['13:10','13:40','ENT']],0],
+['2025-12-10','T','11:45','19:50',[],0],['2025-12-11','T','08:45','14:20',[],0],
+['2025-12-12','T','07:20','15:10',[['11:15','11:45','ENT']],0],
+['2025-12-15','T','07:45','17:30',[['12:37','13:07','ENT']],0],
+['2025-12-16','T','08:15','19:20',[['12:00','12:30','EXT']],0],
+['2025-12-17','T','07:45','18:50',[['13:17','13:47','ENT']],0],
+['2025-12-18','T','09:15','18:30',[['12:00','12:30','EXT']],0],
+['2025-12-19','T','06:45','15:20',[['11:02','11:32','ENT']],0],
+['2025-12-22','CP',null,null,[],0],['2025-12-23','CP',null,null,[],0],
+['2025-12-24','CP',null,null,[],0],['2025-12-25','CP',null,null,[],0],
+['2025-12-26','CP',null,null,[],0],['2025-12-27','CP',null,null,[],0],
+['2025-12-29','CP',null,null,[],0],['2025-12-30','CP',null,null,[],0],
+['2025-12-31','CP',null,null,[],0],['2026-01-01','CP',null,null,[],0],
+['2026-01-02','CP',null,null,[],0],
+['2026-01-05','T','07:20','18:10',[['12:30','13:00','EXT']],0],
+['2026-01-06','T','06:50','18:20',[['12:00','12:30','EXT']],0],
+['2026-01-07','T','06:30','14:40',[['12:20','12:50','EXT']],0],
+['2026-01-08','T','07:15','16:30',[['13:30','14:00','EXT']],0],
+['2026-01-09','T','08:30','18:20',[['13:00','13:30','ENT']],0],
+['2026-01-12','T','07:30','17:20',[['13:00','13:30','ENT']],0],
+['2026-01-13','T','06:30','17:40',[['11:20','11:50','EXT']],0],
+['2026-01-14','T','07:30','17:30',[['12:00','12:30','ENT']],0],
+['2026-01-15','T','12:45','18:20',[],0],['2026-01-16','T','08:20','18:40',[['12:00','12:30','ENT']],0],
+['2026-01-19','T','07:00','17:30',[['12:15','12:45','EXT']],0],
+['2026-01-20','T','08:30','19:00',[['12:00','12:30','EXT']],0],
+['2026-01-21','T','07:15','17:30',[['11:00','11:30','EXT']],0],
+['2026-01-22','T','10:20','18:30',[['12:00','12:30','EXT']],0],
+['2026-01-23','T','08:40','17:30',[['13:00','13:30','EXT']],0],
+['2026-01-26','T','10:10','17:20',[['13:30','14:00','ENT']],0],
+['2026-01-27','T','08:00','12:30',[],0],['2026-01-28','T','06:40','17:30',[['13:00','13:30','EXT']],0],
+['2026-01-29','T','07:40','17:20',[['12:30','13:00','ENT']],0],
+['2026-01-30','T','05:30','16:15',[['13:15','13:45','ENT']],0],
+['2026-02-02','T','09:30','19:00',[['13:30','14:00','EXT']],0],
+['2026-02-03','T','11:30','16:50',[],0],['2026-02-04','T','07:15','17:45',[['11:20','11:50','EXT']],0],
+['2026-02-05','T','08:30','13:50',[],0],['2026-02-06','T','08:10','12:20',[],0],
+['2026-02-09','RC',null,null,[],0],['2026-02-10','RC',null,null,[],0],
+['2026-02-11','RC',null,null,[],0],['2026-02-12','RC',null,null,[],0],
+['2026-02-13','RC',null,null,[],0],
+['2026-02-16','T','07:20','17:30',[['13:00','13:30','EXT']],0],
+['2026-02-17','T','08:15','17:00',[['12:30','13:00','EXT']],0],
+['2026-02-18','T','07:45','16:00',[['13:30','14:00','EXT']],0],
+['2026-02-19','T','08:10','18:00',[['13:00','13:30','EXT']],0],
+['2026-02-20','T','07:20','17:30',[['11:45','12:15','EXT']],0],
+['2026-02-23','T','07:15','13:20',[],0],['2026-02-24','T','06:30','18:00',[['12:15','12:45','EXT']],0],
+['2026-02-25','T','07:45','17:00',[['12:00','12:30','ENT']],0],
+['2026-02-26','T','09:00','16:00',[['13:00','13:30','ENT']],0],
+['2026-02-27','T','09:30','17:20',[['12:45','13:15','EXT']],0],
+['2026-03-02','T','06:45','13:00',[],0],['2026-03-03','T','06:15','14:40',[['12:30','13:00','EXT']],0],
+['2026-03-04','T','08:30','18:30',[['12:45','13:15','ENT']],0],
+['2026-03-05','T','08:20','20:30',[['12:00','12:30','EXT']],0],
+['2026-03-06','T','08:50','18:00',[['13:30','14:00','EXT']],0],
+['2026-03-09','T','10:15','20:30',[['14:00','14:30','ENT']],0],
+['2026-03-10','T','10:20','17:50',[['12:30','13:00','ENT']],0],
+['2026-03-11','T','10:45','16:30',[['12:00','12:30','EXT']],0],
+['2026-03-12','T','08:00','18:00',[['11:50','12:20','EXT']],0],
+['2026-03-13','T','11:00','20:20',[],0],['2026-03-15','T','14:45','16:10',[],0],
+['2026-03-16','T','08:20','17:20',[['11:00','11:30','ENT']],0],
+['2026-03-17','T','07:30','18:20',[['13:30','14:00','EXT']],0],
+['2026-03-18','T','06:00','16:10',[['11:20','11:50','EXT']],0],
+['2026-03-19','T','09:15','18:15',[['12:15','12:45','EXT']],0],
+['2026-03-20','T','10:30','18:10',[['13:00','13:30','EXT']],0],
+['2026-03-23','T','08:00','17:30',[['13:15','13:45','EXT']],0],
+['2026-03-24','RC',null,null,[],0],['2026-03-25','RC',null,null,[],0],
+['2026-03-26','RC',null,null,[],0],['2026-03-27','RC',null,null,[],0],
+['2026-03-30','T','08:15','19:40',[['13:45','14:15','EXT']],0],
+['2026-03-31','RC',null,null,[],0],
+['2026-04-01','MAL',null,null,[],0],['2026-04-02','MAL',null,null,[],0],
+['2026-04-03','MAL',null,null,[],0],['2026-04-06','MAL',null,null,[],0],
+['2026-04-07','MAL',null,null,[],0],['2026-04-08','MAL',null,null,[],0],
+['2026-04-09','MAL',null,null,[],0],['2026-04-10','MAL',null,null,[],0],
+['2026-04-13','MAL',null,null,[],0],['2026-04-14','MAL',null,null,[],0],
+['2026-04-15','MAL',null,null,[],0],['2026-04-16','MAL',null,null,[],0],
+['2026-04-17','MAL',null,null,[],0],['2026-04-20','MAL',null,null,[],0],
+['2026-04-21','MAL',null,null,[],0],['2026-04-22','MAL',null,null,[],0],
+['2026-04-23','MAL',null,null,[],0],['2026-04-24','MAL',null,null,[],0],
+['2026-04-27','MAL',null,null,[],0],['2026-04-28','MAL',null,null,[],0],
+['2026-04-29','MAL',null,null,[],0],['2026-04-30','MAL',null,null,[],0],
+['2026-05-01','MAL',null,null,[],0],['2026-05-04','MAL',null,null,[],0],
+['2026-05-05','MAL',null,null,[],0],['2026-05-06','MAL',null,null,[],0],
+['2026-05-07','MAL',null,null,[],0],['2026-05-08','MAL',null,null,[],0],
+['2026-05-11','MAL',null,null,[],0],['2026-05-12','MAL',null,null,[],0],
+['2026-05-13','MAL',null,null,[],0],['2026-05-14','MAL',null,null,[],0],
+['2026-05-15','MAL',null,null,[],0],['2026-05-18','MAL',null,null,[],0],
+['2026-05-19','MAL',null,null,[],0],['2026-05-20','MAL',null,null,[],0],
+['2026-05-21','MAL',null,null,[],0],['2026-05-22','MAL',null,null,[],0],
+['2026-05-25','MAL',null,null,[],0],['2026-05-26','MAL',null,null,[],0],
+['2026-05-27','MAL',null,null,[],0],['2026-05-28','MAL',null,null,[],0],
+['2026-05-29','MAL',null,null,[],0],['2026-06-01','MAL',null,null,[],0],
+['2026-06-02','MAL',null,null,[],0],
+['2026-06-03','T','06:10','18:00',[['12:15','12:45','EXT']],0],
+['2026-06-04','T','09:15','18:10',[['11:45','12:15','EXT']],0],
+['2026-06-05','T','11:15','19:30',[],0],
+['2026-06-08','T','08:30','17:30',[['12:00','12:30','EXT']],0],
+['2026-06-09','T','08:40','17:00',[['13:30','14:00','EXT']],0],
+['2026-06-10','T','08:10','17:30',[['11:00','11:30','EXT']],0],
+['2026-06-11','T','10:40','19:00',[['13:45','14:15','EXT']],0],
+['2026-06-12','T','07:20','18:40',[['12:30','13:00','EXT']],0],
+['2026-06-15','T','05:40','17:30',[['11:00','11:30','EXT']],0],
+['2026-06-16','T','08:00','16:00',[['13:45','14:15','EXT']],0],
+['2026-06-17','T','09:15','19:15',[['11:30','12:00','EXT']],0],
+['2026-06-18','T','07:15','18:20',[['12:50','13:20','ENT']],0],
+['2026-06-19','T','10:15','17:30',[['12:15','12:45','ENT']],0],
+['2026-06-22','T','12:50','17:50',[],0],['2026-06-23','T','07:00','17:30',[['14:00','14:30','EXT']],0],
+['2026-06-24','T','07:30','13:00',[],0],['2026-06-25','T','07:20','17:40',[['12:30','13:00','ENT']],0],
+['2026-06-26','T','07:30','16:30',[['11:45','12:15','EXT']],0],
+['2026-06-29','T','12:50','17:50',[],0],['2026-06-30','T','09:20','20:10',[['12:20','12:50','ENT']],0],
+['2026-07-01','T','07:30','17:30',[['12:00','12:30','EXT']],0],
+['2026-07-02','T','06:50','12:00',[],0],['2026-07-03','MAL',null,null,[],0],
+['2026-07-06','T','07:15','18:00',[['12:45','13:15','EXT']],0],
+['2026-07-07','T','07:45','18:45',[['13:45','14:15','EXT']],0],
+['2026-07-08','T','08:00','18:30',[['11:45','12:15','EXT']],0],
+['2026-07-09','T','06:30','16:15',[['13:15','13:45','EXT']],0],
+['2026-07-10','T','10:20','17:40',[['11:45','12:15','EXT']],0],
+['2026-07-13','CP',null,null,[],0],['2026-07-14','CP',null,null,[],0],
+['2026-07-15','CP',null,null,[],0],['2026-07-16','CP',null,null,[],0],
+['2026-07-17','CP',null,null,[],0],['2026-07-18','CP',null,null,[],0],
+['2026-07-20','CP',null,null,[],0],['2026-07-21','CP',null,null,[],0],
+['2026-07-22','CP',null,null,[],0],['2026-07-23','CP',null,null,[],0],
+['2026-07-24','CP',null,null,[],0],['2026-07-25','CP',null,null,[],0],
+['2026-07-27','T','06:50','18:15',[['12:30','13:00','EXT']],0],
+['2026-07-28','T','12:10','21:00',[],0],['2026-07-29','T','10:00','17:45',[['12:30','13:00','ENT']],0],
+['2026-07-30','T','07:00','16:00',[['12:00','12:30','EXT']],0],
+['2026-07-31','T','07:45','16:45',[['12:45','13:15','ENT']],0],
+['2026-08-01','T','06:30','13:00',[],0],
+['2026-08-03','T','08:30','16:20',[['11:15','11:45','EXT']],0],
+['2026-08-04','T','10:50','18:50',[['13:15','13:45','ENT']],0],
+['2026-08-05','T','12:40','19:00',[],0],['2026-08-06','T','09:00','17:40',[['13:45','14:15','EXT']],0],
+['2026-08-07','T','14:00','18:20',[],0],['2026-08-08','T','06:30','14:20',[],0],
+['2026-08-10','T','07:50','18:50',[['11:30','12:00','ENT']],0],
+['2026-08-11','T','07:15','19:15',[['13:30','14:00','ENT']],0],
+['2026-08-12','T','08:00','16:10',[['12:00','12:30','ENT']],0],
+['2026-08-13','T','07:00','18:00',[['11:30','12:00','EXT']],0],
+['2026-08-14','T','08:45','14:00',[['13:29','13:59','ENT']],0],
+['2026-08-15','T','06:30','14:20',[],1],
+['2026-08-17','T','08:45','19:00',[['11:45','12:15','EXT']],0],
+['2026-08-18','T','07:40','20:20',[['12:00','12:30','ENT']],0],
+['2026-08-19','T','09:20','19:20',[['13:00','13:30','EXT']],0],
+['2026-08-20','T','05:40','17:40',[['13:15','13:45','ENT']],0],
+['2026-08-21','RC',null,null,[],0],
+['2026-08-24','T','05:45','17:10',[['12:20','12:50','ENT']],0],
+['2026-08-25','T','08:30','19:30',[['14:30','15:00','EXT']],0],
+['2026-08-26','T','07:00','13:50',[['12:00','12:30','EXT']],0],
+['2026-08-27','T','08:20','19:00',[['14:30','15:00','EXT']],0],
+['2026-08-28','T','07:00','16:00',[['14:00','14:30','EXT']],0],
+['2026-08-29','T','06:30','14:20',[],0],
+['2026-08-31','T','08:20','17:40',[['12:00','12:30','EXT']],0],
+['2026-09-01','T','05:15','18:00',[['14:00','14:30','EXT']],0],
+['2026-09-02','T','12:00','18:40',[],0],['2026-09-03','T','08:45','20:00',[['11:30','12:00','EXT']],0],
+['2026-09-04','T','08:00','20:00',[],0],['2026-09-05','T','06:30','14:20',[],0],
+];
+const AP=['2025-05-19','2025-05-26','2025-06-02','2025-06-09','2025-06-16','2025-06-23',
+'2025-06-30','2025-07-07','2025-07-14','2025-07-28','2025-08-11','2025-08-25',
+'2025-09-08','2025-09-22','2025-10-06','2025-10-20','2025-11-03','2025-11-17',
+'2025-12-01','2025-12-15','2025-12-29','2026-01-12','2026-01-26','2026-02-09',
+'2026-02-23','2026-03-09','2026-03-23','2026-04-06','2026-04-20','2026-05-04',
+'2026-05-18','2026-06-01','2026-06-15','2026-06-29','2026-07-13','2026-07-27',
+'2026-08-10','2026-08-24'];
+
+function loadArchive(){
+  AD.forEach(([k,ty,deb,fin,pz,fer])=>{
+    const d={t:ty,p:[]};
+    if(ty==='T'){
+      if(deb)d.deb=deb; if(fin)d.fin=fin;
+      pz.forEach(([p1,p2,pty])=>d.p.push({d:p1,f:p2,ty:pty}));
+      if(fer||isFerie(k))d.fer=true;
+    }
+    DB.days[k]=d;
+  });
+  AP.forEach(s=>{if(!DB.periods.some(p=>p.start===s))DB.periods.push({start:s,nb:1});gb(s);});
+  DB.periods.sort((a,b)=>a.start<b.start?-1:1);
+  DB.s.anchor='2025-05-19'; DB.per={start:'2025-05-19',nb:1};
+  save(); curDate='2026-09-05'; curMonth='2026-09';
+  renderAll();
+  alert('✅ Archive chargée : '+AD.length+' journées · '+AP.length+' quatorzaines.');
+}
+
+function minutesNuit(a,b,S){
+  const nd=P(S.nuitDeb),nf=P(S.nuitFin);
+  if(!nd||!nf||!S.nuitMaj)return 0;
+  let mn=0;
+  for(let t=a;t<b;t++){if(t>=nd||t<nf)mn++}
+  return mn;
+}
 function cd(k){
   const d=DB.days[k],S=DB.s;
   const r={amp:0,tte:0,seuil:0,idaj:0,ir:0,iru:0,rc:0,fer:0,dim:0,trav:0,pz:0,nuit:0,al:[],deb:null,fin:null,t:d?d.t:null};
@@ -362,10 +736,16 @@ function cd(k){
     });
     r.amp=br+S.hab; r.tte=br-r.pz;
     if(S.min&&r.tte<270)r.tte=270;
-    r.seuil=r.tte; r.trav=1; r.deb=a; r.fin=b;
+    r.seuil=r.tte; r.trav=1;
+    r.deb=a; r.fin=b;
     r.idaj=Math.max(0,r.amp-S.idaj*60);
     if(d.fer)r.fer=r.tte;
     if(isDim)r.dim=1;
+    r.nuit=minutesNuit(a,b,S);
+    if(r.amp>S.maxAmp*60)r.al.push({lvl:'b',m:'Amplitude '+F(r.amp)+' > '+S.maxAmp+'h réglementaires'});
+    if(r.pz===0&&r.tte>=360)r.al.push({lvl:'w',m:'≥ 6h travaillées sans pause — 20 min dues (art. L3121-16)'});
+    if(isFerie(k)&&!d.fer)r.al.push({lvl:'w',m:'Jour férié travaillé — majoration 100 % non cochée'});
+    if(r.tte>660)r.al.push({lvl:'w',m:'TTE > 11h — journée exceptionnellement longue'});
   }
   else if(d.t==='CP')r.seuil=S.cp;
   else if(d.t==='RC')r.rc=S.rc;
@@ -385,7 +765,7 @@ function calcPer(start,nb){
         s.amp+=r.amp; s.tte+=r.tte; s.trav+=r.trav;
         o.seuil+=r.seuil;
         G.idaj+=r.idaj; G.ir+=r.ir; G.iru+=r.iru;
-        G.rc+=r.rc; G.fer+=r.fer;
+        G.rc+=r.rc; G.fer+=r.fer; G.nuit+=r.nuit;
         if(r.fer)G.ferJ.push(k);
         if(r.dim&&DB.days[k]&&DB.days[k].t==='T'){G.dim++;G.dimJ.push(k)}
         r.al.forEach(a=>AL.push({k,...a}));
@@ -442,17 +822,34 @@ function tab(t){
 }
 function goDay(n){curDate=addD(curDate,n);renderDay()}
 function goToday(){curDate=today();curMonth=curDate.slice(0,7);renderDay();window.scrollTo(0,0)}
-function setD(f,v){gd(curDate)[f]=v;save();renderDay()}
+function setD(f,v){
+  const d=gd(curDate);
+  if(f==='t'&&d.t!==v)pushUndo('Changement type '+d.t+'→'+v+' le '+short(curDate));
+  d[f]=v; save(); renderDay();
+}
 function setP(i,f,v){const d=gd(curDate);if(!d.p[i])d.p[i]={ty:'ENT'};d.p[i][f]=v;save();renderDay()}
 function addP(){gd(curDate).p.push({d:'',f:'',ty:'ENT'});save();renderDay()}
 function delP(i){gd(curDate).p.splice(i,1);save();renderDay()}
+function dupliConfirm(){
+  const prev=DB.days[addD(curDate,-1)];
+  if(!prev)return alert('Rien la veille à copier.');
+  const d=gd(curDate);
+  if(d.t!=='REPOS'||d.deb){
+    if(!confirm('Le jour courant a déjà des données. Écraser avec la veille ?'))return;
+  }
+  pushUndo('Copie veille → '+short(curDate));
+  DB.days[curDate]=JSON.parse(JSON.stringify(prev));
+  save(); renderDay();
+}
 
 function renderDay(){
   const k=curDate,d=gd(k),r=cd(k);
-  const isD=dowN(k)===0;
-  $('dLbl').textContent=dow(k).toUpperCase()+' '+k.slice(8)+' '+MON[+k.slice(5,7)-1]+' '+k.slice(0,4)+(isD?' 🔵':'');
+  const isF=isFerie(k),isD=dowN(k)===0;
+  $('dLbl').textContent=dow(k).toUpperCase()+' '+k.slice(8)+' '+MON[+k.slice(5,7)-1]+' '+k.slice(0,4)
+    +(isF?' ☀️':'')+(isD&&!isF?' 🔵':'')+(k===today()?' • auj.':'');
   const TYPES={T:'Travail',REPOS:'Repos',RC:'RC',CP:'Congé',MAL:'Maladie'};
-  $('dType').innerHTML=Object.entries(TYPES).map(([x,l])=>`<button class="${d.t===x?'on':''}" onclick="setD('t','${x}')">${l}</button>`).join('');
+  $('dType').innerHTML=Object.entries(TYPES).map(([x,l])=>
+    `<button class="${d.t===x?'on':''}" onclick="setD('t','${x}')">${l}</button>`).join('');
   let h='';
   if(d.t==='T'){
     h=`<div class="g2">
@@ -460,6 +857,11 @@ function renderDay(){
 <div><label>Fin</label><input type="time" value="${d.fin||''}" onchange="setD('fin',this.value)"></div>
 </div>
 <div style="margin-top:11px"><label>Pauses</label>`;
+    const _a=P(d.deb),_b0=P(d.fin);
+    let _b=_b0;
+    if(_a!=null&&_b!=null&&_b<=_a)_b+=1440;
+    const _pd=P(DB.s.panDeb),_pf=P(DB.s.panFin);
+    const _panOK=_a!=null&&_b!=null&&_a<=_pd&&_b>=_pf;
     d.p.forEach((p,i)=>h+=`<div class="pz"><div class="row">
 <input type="time" value="${p.d||''}" onchange="setP(${i},'d',this.value)" style="flex:1">
 <input type="time" value="${p.f||''}" onchange="setP(${i},'f',this.value)" style="flex:1">
@@ -468,11 +870,12 @@ function renderDay(){
 <select onchange="setP(${i},'ty',this.value)" style="flex:1">
 <option value="ENT"${p.ty==='ENT'?' selected':''}>Intérieur (IRU)</option>
 <option value="EXT"${p.ty==='EXT'?' selected':''}>Extérieur (IR)</option>
-</select></div></div>`);
+</select>
+<span class="mut">${_panOK?'🍽️ panier':'—'}</span></div></div>`);
     h+=`<button class="g" onclick="addP()" style="width:100%">+ Ajouter une pause</button></div>
 <div style="margin-top:11px">
 <label style="text-transform:none;font-size:14px;color:var(--txt)">
-<input type="checkbox" ${d.fer?'checked':''} onchange="setD('fer',this.checked)"> ☀️ Jour férié travaillé (100 %)
+<input type="checkbox" ${d.fer?'checked':''} onchange="setD('fer',this.checked)"> ☀️ Jour férié travaillé (majoration 100 %)
 </label></div>`;
   }
   $('dWork').innerHTML=h;
@@ -485,11 +888,36 @@ function renderDay(){
   const diff=nDays(DB.s.anchor,k);
   const qs=addD(DB.s.anchor,Math.floor(diff/14)*14);
   const o=calcPer(qs,1).Q[0],N=DB.s.base*120,pc=Math.min(100,o.seuil/N*100);
+  const barCls=pc>=100?'bar bad':pc>=85?'bar warn':'bar';
   $('dQuat').innerHTML=`<div class="mut">${short(qs)} → ${short(addD(qs,13))}</div>
-<div class="bar"><i style="width:${pc.toFixed(1)}%"></i></div>
+<div class="${barCls}"><i style="width:${pc.toFixed(1)}%"></i></div>
 <div class="row" style="justify-content:space-between">
 <span><b>${F(o.seuil)}</b> / ${F(N)}</span>
-<span class="mut">HS : ${F(o.h25)} à 25% · ${F(o.h50)} à 50%</span>
+<span class="mut">${o.seuil<N?'reste '+F(N-o.seuil)+' avant HS':'🔥 HS : '+F(o.h25)+' à 25% · '+F(o.h50)+' à 50%'}</span>
+</div>`;
+  renderProj(k,qs);
+  if(_undo)$('undoDesc').textContent=_undo.desc;
+}
+
+function renderProj(k,qs){
+  const qEnd=addD(qs,13);
+  const today_=today();
+  if(k>qEnd||k<qs){$('dProj').innerHTML='<span class="mut">Navigue dans la quatorzaine courante pour voir la projection.</span>';return}
+  const restant=nDays(today_,qEnd);
+  if(restant<=0){$('dProj').innerHTML='<span class="mut">Quatorzaine terminée.</span>';return}
+  $('dProjLbl').textContent=short(qs)+' → '+short(qEnd);
+  const o=calcPer(qs,1).Q[0];
+  const N=DB.s.base*120;
+  const trav=o.trav||1;
+  const moyJ=o.seuil/trav;
+  const joursTravRestants=Math.round(restant*trav/(nDays(qs,today_)+1||1));
+  const proj=o.seuil+joursTravRestants*moyJ;
+  const projH25=Math.min(Math.max(proj-N,0),DB.s.pl*60);
+  const projH50=Math.max(proj-N-DB.s.pl*60,0);
+  $('dProj').innerHTML=`
+<div class="g2">
+<div class="kpi"><b>${restant}</b><span>Jours restants</span></div>
+<div class="kpi ${projH50>0?'bad':projH25>0?'warn':''}"><b>${F(Math.round(proj))}</b><span>TTE projetée</span></div>
 </div>`;
 }
 
@@ -498,28 +926,34 @@ function renderMonth(){
   $('mLbl').textContent=MON[+curMonth.slice(5,7)-1]+' '+curMonth.slice(0,4);
   let h=['L','M','M','J','V','S','D','Σ'].map(x=>`<div class="h">${x}</div>`).join('');
   let cur=mono(curMonth+'-01');
-  const G={amp:0,tte:0,trav:0,ir:0,iru:0};
+  const G={amp:0,tte:0,trav:0,ir:0,iru:0,idaj:0,dim:0,fer:0};
   const chartD=[];
   for(let w=0;w<6;w++){
     let wa=0,wt=0;
     for(let i=0;i<7;i++){
       const k=addD(cur,w*7+i),r=cd(k),out=k.slice(0,7)!==curMonth;
+      const hasErr=r.al.some(a=>a.lvl==='b');
       if(!out){
         wa+=r.amp;wt+=r.tte;
         G.amp+=r.amp;G.tte+=r.tte;G.trav+=r.trav;
-        G.ir+=r.ir;G.iru+=r.iru;
-        if(r.tte>0)chartD.push({k,v:r.tte});
+        G.ir+=r.ir;G.iru+=r.iru;G.idaj+=r.idaj;
+        G.dim+=r.dim;G.fer+=r.fer;
+        if(r.tte>0)chartD.push({k,v:r.tte,hs:false});
       }
-      h+=`<div class="cel ${r.t||''} ${out?'off':''} ${k===today()?'now':''}" onclick="curDate='${k}';tab('jour')">
+      h+=`<div class="cel ${r.t||''} ${out?'off':''} ${k===today()?'now':''} ${hasErr&&!out?'err':''}"
+onclick="curDate='${k}';tab('jour')">
 <div class="d">${+k.slice(8)}</div>
-<div class="v">${r.tte?F(r.tte):(r.t==='RC'?'RC':r.t==='CP'?'CP':'')}</div>
+<div class="v">${r.tte?F(r.tte):(r.t==='RC'?'RC':r.t==='CP'?'CP':r.t==='MAL'?'AM':'')}</div>
 </div>`;
     }
     h+=`<div class="rec">${wt?'<span style="font-size:9px">'+F(wa)+'</span><b>'+F(wt)+'</b>':''}</div>`;
     if(addD(cur,w*7+7).slice(0,7)!==curMonth&&w>=3)break;
   }
   $('mCal').innerHTML=h;
-  $('mKpi').innerHTML=[['Amplitude',F(G.amp)],['TTE',F(G.tte)],['Jours trav.',G.trav],['Paniers',G.ir+G.iru]].map(x=>`<div class="kpi"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
+  $('mKpi').innerHTML=[
+    ['Amplitude',F(G.amp)],['TTE',F(G.tte)],['Jours trav.',G.trav],
+    ['Paniers',G.ir+G.iru],['Dimanches',G.dim],['Fériés trav.',G.fer?'oui':'—']
+  ].map(x=>`<div class="kpi"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
   const max=Math.max(...chartD.map(x=>x.v),1);
   $('mChart').innerHTML=chartD.map(x=>{
     const pct=(x.v/max*100).toFixed(1);
@@ -544,9 +978,10 @@ function renderPay(){
   const{Q,AL,G}=calcPer(st,nb);
   $('pKpi').innerHTML=[
     ['Amplitude',F(G.amp)],['TTE',F(G.tte)],
-    ['HS 25 %',F(G.h25)],['HS 50 %',F(G.h50)],
+    ['HS 25 %',F(G.h25),G.h25>0?'warn':''],
+    ['HS 50 %',F(G.h50),G.h50>0?'bad':''],
     ['Jours trav.',G.trav],['Paniers',G.ir+G.iru]
-  ].map(x=>`<div class="kpi"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
+  ].map(x=>`<div class="kpi ${x[2]||''}"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
   let h='<tr><th>Détail</th><th class="n">Ampl.</th><th class="n">TTE</th><th class="n">Norm.</th><th class="n">HS 25%</th><th class="n">HS 50%</th></tr>';
   Q.forEach((o,i)=>{
     o.w.forEach((s,j)=>h+=`<tr><td>Sem. ${j+1} — ${short(s.start)}</td><td class="n">${F(s.amp)}</td><td class="n">${F(s.tte)}</td><td class="n mut" colspan="3">${s.trav} j</td></tr>`);
@@ -559,7 +994,7 @@ function renderPay(){
     +`<tr class="t"><td>Brut soumis</td><td colspan="2"></td><td class="n">${EUR(tot)}</td></tr>`;
   const d25=Math.max(G.h25/60-B.p25,0),d50=Math.max(G.h50/60-B.p50,0);
   const acq=d25*1.25+d50*1.5,sol=B.rcOld+acq;
-  $('pRcOut').innerHTML=`<div class="al i">RC généré ce mois : <b>${acq.toFixed(2)} h</b> · Solde RC total : <b>${sol.toFixed(2)} h</b></div>`;
+  $('pRcOut').innerHTML=`<div class="al i">RC généré ce mois : <b>${acq.toFixed(2)} h</b> · Solde RC : <b>${sol.toFixed(2)} h</b></div>`;
 }
 
 function renderAudit(){
@@ -573,12 +1008,9 @@ function renderAudit(){
     h+=`<tr><td>${short(p.start)}→${short(addD(p.start,p.nb*14-1))}</td><td class="n">${F(G.tte)}</td><td class="n">${C2(G.h25)}</td><td class="n">${C2(G.h50)}</td><td class="n">${acq.toFixed(2)}</td><td class="n">${B.rcAcq?B.rcAcq.toFixed(2):'—'}</td></tr>`;
   });
   $('aTab').innerHTML=h;
-  $('aKpi').innerHTML=[
-    ['Périodes',DB.periods.length],['Jours travaillés',T.trav],
-    ['TTE total',F(T.tte)],['HS 25 %',C2(T.h25)],['RC généré',T.acq.toFixed(2)+' h']
-  ].map(x=>`<div class="kpi"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
+  $('aKpi').innerHTML=[['Périodes',DB.periods.length],['TTE total',F(T.tte)],['HS 25 %',C2(T.h25)],['RC total',T.acq.toFixed(2)+' h']].map(x=>`<div class="kpi"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
   const rcSol=T.acq-T.dec;
-  $('aRc').innerHTML=`<div class="kpis"><div class="kpi"><b>${T.acq.toFixed(2)} h</b><span>RC généré total</span></div><div class="kpi"><b>${rcSol.toFixed(2)} h</b><span>Solde RC</span></div></div>`;
+  $('aRc').innerHTML=`<div class="kpis"><div class="kpi"><b>${T.acq.toFixed(2)} h</b><span>RC acquis</span></div><div class="kpi"><b>${rcSol.toFixed(2)} h</b><span>Solde RC</span></div></div>`;
 }
 
 const RG={
@@ -608,33 +1040,30 @@ function renderAll(){
 }
 
 /* ═══════════════════════════════════════════════
-   EXTRACTION UNIVERSELLE PDF (SANS OCR EXTERNE)
+   PDF TEXT EXTRACTION DIRECTE SANS TESSERACT
 ═══════════════════════════════════════════════ */
 const PDF_WORKER='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.worker.min.js';
 let _wset=false;
 
 async function extractPdfText(file){
   const lib=window.pdfjsLib||window['pdfjs-dist/build/pdf'];
-  if(!lib)throw new Error('PDF.js non chargé.');
+  if(!lib)throw new Error('PDF.js non initialisé.');
   if(!_wset){lib.GlobalWorkerOptions.workerSrc=PDF_WORKER;_wset=true;}
   const buf=await file.arrayBuffer();
   const pdf=await lib.getDocument({data:new Uint8Array(buf)}).promise;
-  let fullText='';
+  let full='';
   for(let p=1;p<=pdf.numPages;p++){
     const page=await pdf.getPage(p);
-    const content=await page.getTextContent();
+    const ct=await page.getTextContent();
     let lastY, line='';
-    for(const item of content.items){
-      if(lastY!=null&&Math.abs(item.transform[5]-lastY)>3){
-        fullText+=line+'\n';
-        line='';
-      }
-      line+=item.str+' ';
-      lastY=item.transform[5];
-    }
-    fullText+=line+'\n';
+    ct.items.forEach(it=>{
+      if(lastY!=null&&Math.abs(it.transform[5]-lastY)>3){full+=line+'\n';line=''}
+      line+=it.str+' ';
+      lastY=it.transform[5];
+    });
+    full+=line+'\n';
   }
-  return fullText;
+  return full;
 }
 
 /* ═══════════════════════════════════════════════
@@ -643,17 +1072,17 @@ async function extractPdfText(file){
 async function parseBulFile(file){
   if(!file)return;
   const out=$('bulOut');
-  out.innerHTML='<div class="al i">⏳ Lecture du bulletin…</div>';
+  out.innerHTML='<div class="al i">⏳ Traitement du bulletin PDF…</div>';
   try{
     const text=await extractPdfText(file);
     $('bulTxt').value=text;
     parseBulletin();
-  }catch(e){out.innerHTML='<div class="al b">❌ Erreur PDF : '+esc(e.message)+'</div>';}
+  }catch(e){out.innerHTML='<div class="al b">❌ '+esc(e.message)+'</div>';}
 }
 
 function parseBulletin(){
   const raw=$('bulTxt').value;
-  if(!raw.trim()){$('bulOut').innerHTML='<div class="al w">Colle d\'abord le texte du bulletin.</div>';return}
+  if(!raw.trim()){$('bulOut').innerHTML='<div class="al w">Colle le texte du bulletin d\'abord.</div>';return}
   const lines=raw.replace(/\u00a0/g,' ').replace(/\r/g,'\n').split('\n').map(l=>l.trim()).filter(l=>l);
   const bul={};
 
@@ -668,8 +1097,8 @@ function parseBulletin(){
 
   function parseNum(s){return parseFloat(s.replace(/\s/g,'').replace(',','.'))||0}
   function numsOfLine(l){
-    const sanitized=l.replace(/(?:100|125|150|25|50)\s*%/g,'');
-    return[...sanitized.matchAll(/([\d][\d\s]*(?:[.,]\d+)?)/g)].map(m=>parseNum(m[0])).filter(n=>!isNaN(n)&&n>0);
+    const clean=l.replace(/(?:100|125|150|25|50)\s*%/g,'');
+    return[...clean.matchAll(/([\d][\d\s]*(?:[.,]\d+)?)/g)].map(m=>parseNum(m[0])).filter(n=>!isNaN(n)&&n>0);
   }
 
   for(const l of lines){
@@ -685,14 +1114,8 @@ function parseBulletin(){
     else if(/^net\s+pay[eé]/i.test(l)&&ns.length>=1){bul.net=ns[ns.length-1]}
   }
 
-  for(const l of lines){
-    const m=l.match(/net\s+pay[eé]\s*:\s*([\d\s,.]+)\s*euros?/i);
-    if(m){bul.net=parseNum(m[1]);break}
-  }
-
-  const mKey=normalizeMoisKey(bul.mois)||'2026-08';
-  bul.mois=mKey;
-  const existing=DB.bulletins.findIndex(b=>b.mois===mKey);
+  bul.mois=normalizeMoisKey(bul.mois)||'2026-08';
+  const existing=DB.bulletins.findIndex(b=>b.mois===bul.mois);
   if(existing>=0)DB.bulletins[existing]=bul; else DB.bulletins.push(bul);
   save();
   afficherBulletin(bul);
@@ -762,10 +1185,10 @@ function afficherBulletin(bul){
 
   let al='';
   if(romi){
-    al+=`<div class="al p">📑 <b>Relevé ROMI1 chargé (${romi.periodeDu} au ${romi.periodeAu}) :</b> TTE constatée ${romi.tte}h · HS réelles : <b>${romi.hsTotal}h</b> (bulletin paie <b>${bul.hs25H}h</b>, reste en RC : <b>${romi.rcAcquis}h</b>).</div>`;
+    al+=`<div class="al p">📑 <b>ROMI1 officiel (${romi.periodeDu} → ${romi.periodeAu}) :</b> TTE constatée ${romi.tte}h · HS : <b>${romi.hsTotal}h</b> (bulletin n'a payé que <b>${bul.hs25H}h</b>, reste en RC : <b>${romi.rcAcquis}h</b>).</div>`;
   }
   $('bulAl').innerHTML=al;
-  $('bulOut').innerHTML='<div class="al k">✅ Bulletin analysé sans corruption.</div>';
+  $('bulOut').innerHTML='<div class="al k">✅ Bulletin analysé avec succès.</div>';
 }
 
 function renderBulHist(){
@@ -778,7 +1201,7 @@ function renderBulHist(){
 }
 
 /* ═══════════════════════════════════════════════
-   PARSEUR ROMI1 DIRECT ET ROBUSTE
+   PARSEUR ROMI1 OFFICIEL
 ═══════════════════════════════════════════════ */
 async function parseRomiFile(file){
   if(!file)return;
@@ -794,8 +1217,6 @@ async function parseRomiFile(file){
 function parseROMI(){
   const raw=$('romTxt').value;
   if(!raw.trim()){$('romOut').innerHTML='<div class="al w">Colle d\'abord le texte du relevé ROMI1.</div>';return}
-  
-  // Remplacement des caractères grecs ou mal encodés par les lettres latines standard
   const cleanText=raw.replace(/\u00a0/g,' ').replace(/[\u0370-\u03ff]/g,'T').replace(/\r/g,'\n');
   const lines=cleanText.split('\n').map(l=>l.trim()).filter(l=>l);
   const rom={};
@@ -910,7 +1331,11 @@ function wipe(){if(confirm('Tout effacer ?')){localStorage.removeItem(LS);locati
 
 load();
 curDate=today();curMonth=curDate.slice(0,7);
-renderDay();renderReg();
+if(!Object.keys(DB.days).length){
+  loadArchive();
+}else{
+  renderDay();renderReg();
+}
 </script>
 </body>
 </html>
