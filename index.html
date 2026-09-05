@@ -86,18 +86,15 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 .tag.ok{background:#0f2d1a;color:var(--ok)}.tag.w{background:#2d2411;color:var(--warn)}.tag.b{background:#2d1516;color:var(--bad)}.tag.i{background:#11202d;color:var(--blue)}
 .fab{position:fixed;bottom:0;left:0;right:0;background:#0d1117ee;backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:9px 12px;display:flex;gap:8px;z-index:30}
 .fab button{flex:1;font-size:13px}
-/* graphique */
 .chart{display:flex;align-items:flex-end;gap:3px;height:80px;margin:9px 0}
 .chart .bar-w{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px}
 .chart .bar-w .bv{background:var(--acc);border-radius:3px 3px 0 0;width:100%;min-height:2px}
 .chart .bar-w .bv.hs{background:var(--warn)}
 .chart .bar-w .bl{font-size:8px;color:var(--dim)}
-/* modal */
 .modal-bg{display:none;position:fixed;inset:0;background:#0009;z-index:50;justify-content:center;align-items:flex-end}
 .modal-bg.on{display:flex}
 .modal{background:var(--card);border:1px solid var(--line);border-radius:16px 16px 0 0;padding:18px;width:100%;max-width:600px;max-height:80vh;overflow-y:auto}
 .modal h3{margin:0 0 12px;font-size:16px}
-/* diff bulletin */
 .diff-ok{color:var(--ok)}.diff-bad{color:var(--bad)}.diff-warn{color:var(--warn)}
 @media(min-width:600px){.modal{border-radius:16px;margin:auto}}
 @media print{.tabs,.fab,header,button,textarea,.modal-bg{display:none!important}section{display:block!important}body{background:#fff;color:#000;padding:0}.card{border:1px solid #ccc;background:#fff;page-break-inside:avoid}h2,.kpi b{color:#000}}
@@ -117,7 +114,6 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 </header>
 <main>
 
-<!-- ═══ JOUR ═══ -->
 <section id="s-jour" class="on">
 <div class="nav">
 <button class="g" onclick="goDay(-1)">‹</button>
@@ -140,7 +136,6 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 </div>
 </section>
 
-<!-- ═══ MOIS ═══ -->
 <section id="s-mois">
 <div class="nav">
 <button class="g" onclick="goMonth(-1)">‹</button>
@@ -154,7 +149,6 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 <div class="card"><h2>Dimanches & fériés travaillés</h2><div id="mDim"></div></div>
 </section>
 
-<!-- ═══ PAIE ═══ -->
 <section id="s-paie">
 <div class="nav">
 <button class="g" onclick="goPer(-1)">‹</button>
@@ -190,7 +184,6 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 <div class="card"><h2>Comparaison TTE bulletin</h2><div style="overflow-x:auto"><table id="pCmp"></table></div></div>
 </section>
 
-<!-- ═══ AUDIT ═══ -->
 <section id="s-audit">
 <div class="card"><h2>Vue globale</h2><div class="kpis" id="aKpi"></div></div>
 <div class="card"><h2>Résumé annuel</h2><div style="overflow-x:auto"><table id="aAnn"></table></div></div>
@@ -200,7 +193,6 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 <div class="card"><h2>Anomalies critiques</h2><div id="aAl"></div></div>
 </section>
 
-<!-- ═══ BULLETIN (nouveau) ═══ -->
 <section id="s-bul">
 <div class="card">
 <h2>📄 Importer un bulletin de paie employeur</h2>
@@ -224,7 +216,6 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 </div>
 </section>
 
-<!-- ═══ RÉGLAGES ═══ -->
 <section id="s-reg">
 <div class="card"><h2>Identité & contrat</h2>
 <div class="g2">
@@ -269,7 +260,6 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 </section>
 </main>
 
-<!-- Modal undo -->
 <div class="modal-bg" id="undoModal">
 <div class="modal">
 <h3>↩️ Annuler la dernière action ?</h3>
@@ -282,9 +272,6 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════
-   CONSTANTES & ÉTAT GLOBAL
-═══════════════════════════════════════════════ */
 const LS='mesheures_v3';
 const DEF={
   nom:'',emb:'2019-09-09',
@@ -302,11 +289,8 @@ const DEF={
 };
 let DB={s:{...DEF},days:{},cmp:{},periods:[],bul:{},bulletins:[],per:{start:'2025-05-19',nb:1},exp:null};
 let curDate,curMonth,curTab='jour';
-let _undo=null; // {days, desc}
+let _undo=null;
 
-/* ═══════════════════════════════════════════════
-   UTILITAIRES
-═══════════════════════════════════════════════ */
 const $=i=>document.getElementById(i);
 const pad=n=>String(n).padStart(2,'0');
 const isoOf=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
@@ -317,7 +301,7 @@ const nDays=(a,b)=>Math.round((dOf(b)-dOf(a))/864e5);
 const DOW=['dim','lun','mar','mer','jeu','ven','sam'];
 const MON=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
 const dow=s=>DOW[dOf(s).getDay()];
-const dowN=s=>dOf(s).getDay(); // 0=dim
+const dowN=s=>dOf(s).getDay();
 const mono=s=>{const d=dOf(s);d.setDate(d.getDate()-((d.getDay()+6)%7));return isoOf(d)};
 const P=s=>{if(!s||!/^\d{1,2}:\d{2}/.test(s))return null;const[h,m]=s.split(':').map(Number);return h*60+m};
 const F=m=>{if(m==null)return'—';const g=m<0;m=Math.abs(Math.round(m));return(g?'-':'')+Math.floor(m/60)+'h'+pad(m%60)};
@@ -327,9 +311,6 @@ const short=s=>s.slice(8)+'/'+s.slice(5,7);
 const shortY=s=>s.slice(8)+'/'+s.slice(5,7)+'/'+s.slice(2,4);
 const esc=s=>s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):'';
 
-/* ═══════════════════════════════════════════════
-   FÉRIÉS
-═══════════════════════════════════════════════ */
 function easterOf(y){
   const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,
   f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,
@@ -348,23 +329,16 @@ function feriesY(y){
 }
 const isFerie=k=>feriesY(+k.slice(0,4)).has(k);
 
-/* ═══════════════════════════════════════════════
-   ANCIENNETÉ AUTOMATIQUE
-═══════════════════════════════════════════════ */
 function calcAnc(emb){
   if(!emb)return{y:0,m:0,pct:0};
   const e=dOf(emb),n=new Date();
   let y=n.getFullYear()-e.getFullYear(),mo=n.getMonth()-e.getMonth();
   if(mo<0){y--;mo+=12}
-  // CCN Transport : 2% après 2 ans, +1% par an jusqu'à 12%
   let pct=0;
   if(y>=2)pct=Math.min(2+(y-2),12);
   return{y,m:mo,pct};
 }
 
-/* ═══════════════════════════════════════════════
-   STOCKAGE
-═══════════════════════════════════════════════ */
 function save(){
   try{localStorage.setItem(LS,JSON.stringify(DB))}
   catch(e){alert('Stockage plein : exportez vos données !\n'+e.message)}
@@ -393,7 +367,6 @@ function gb(s){
 }
 function setBul(f,v){gb(DB.per.start)[f]=v;save();renderPay()}
 
-/* UNDO */
 function pushUndo(desc){
   _undo={days:JSON.stringify(DB.days),periods:JSON.stringify(DB.periods),desc};
 }
@@ -406,9 +379,6 @@ function doUndo(){
 }
 function closeModal(id){$('undoModal').classList.remove('on')}
 
-/* ═══════════════════════════════════════════════
-   ARCHIVE PDF PRÉ-CHARGÉE
-═══════════════════════════════════════════════ */
 const AD=[
 ['2025-05-19','T','08:00','20:00',[],0],['2025-05-21','T','08:00','20:00',[],0],
 ['2025-05-23','T','07:20','18:30',[['12:55','13:25','ENT']],0],
@@ -437,7 +407,7 @@ const AD=[
 ['2025-07-03','T','13:30','21:00',[],0],['2025-07-04','T','09:50','19:00',[['14:25','14:55','ENT']],0],
 ['2025-07-07','T','09:40','20:00',[['14:50','15:20','ENT']],0],
 ['2025-07-08','T','14:30','19:30',[],0],['2025-07-09','T','06:00','17:00',[['11:30','12:00','ENT']],0],
-['2025-07-10','T','09:00','19:30',[['14:15','14:45','ENT']],0],
+['2025-10-10','T','09:00','19:30',[['14:15','14:45','ENT']],0],
 ['2025-07-11','T','08:30','18:10',[['13:20','13:50','ENT']],0],
 ['2025-07-25','T','13:20','19:20',[],0],
 ['2025-07-28','T','09:20','17:50',[['13:35','14:05','ENT']],0],
@@ -695,14 +665,9 @@ function loadArchive(){
   alert('✅ Archive chargée : '+AD.length+' journées · '+AP.length+' quatorzaines.');
 }
 
-/* ═══════════════════════════════════════════════
-   CALCUL JOURNÉE
-═══════════════════════════════════════════════ */
 function minutesNuit(a,b,S){
-  // Compte les minutes entre a et b qui tombent entre nuitDeb et nuitFin
-  const nd=P(S.nuitDeb),nf=P(S.nuitFin); // ex: 21h00=1260, 06h00=360
+  const nd=P(S.nuitDeb),nf=P(S.nuitFin);
   if(!nd||!nf||!S.nuitMaj)return 0;
-  // la plage nuit chevauche minuit: [nd..1440] + [0..nf]
   let mn=0;
   for(let t=a;t<b;t++){
     if(t>=nd||t<nf)mn++;
@@ -731,9 +696,7 @@ function cd(k){
     r.idaj=Math.max(0,r.amp-S.idaj*60);
     if(d.fer)r.fer=r.tte;
     if(isDim)r.dim=1;
-    // heures de nuit
     r.nuit=minutesNuit(a,b,S);
-    // alertes
     if(r.amp>S.maxAmp*60)r.al.push({lvl:'b',m:'Amplitude '+F(r.amp)+' > '+S.maxAmp+'h réglementaires'});
     if(r.pz===0&&r.tte>=360)r.al.push({lvl:'w',m:'≥ 6h travaillées sans pause — 20 min dues (art. L3121-16)'});
     if(isFerie(k)&&!d.fer)r.al.push({lvl:'w',m:'Jour férié travaillé — majoration 100 % non cochée'});
@@ -742,7 +705,6 @@ function cd(k){
   else if(d.t==='CP')r.seuil=S.cp;
   else if(d.t==='RC')r.rc=S.rc;
   else if(d.t==='NUIT'){
-    // poste de nuit déclaré manuellement
     const a=P(d.deb),b0=P(d.fin);
     if(a!=null&&b0!=null){
       const b=b0<=a?b0+1440:b0,br=b-a;
@@ -755,9 +717,6 @@ function cd(k){
   return r;
 }
 
-/* ═══════════════════════════════════════════════
-   CALCUL PÉRIODE
-═══════════════════════════════════════════════ */
 function calcPer(start,nb){
   const S=DB.s,Q=[],AL=[];
   let pk=null,pe=null;
@@ -773,9 +732,8 @@ function calcPer(start,nb){
         G.idaj+=r.idaj; G.ir+=r.ir; G.iru+=r.iru;
         G.rc+=r.rc; G.fer+=r.fer; G.nuit+=r.nuit;
         if(r.fer)G.ferJ.push(k);
-        if(r.dim&&d&&DB.days[k]&&DB.days[k].t==='T'){G.dim++;G.dimJ.push(k)}
+        if(r.dim&&DB.days[k]&&DB.days[k].t==='T'){G.dim++;G.dimJ.push(k)}
         r.al.forEach(a=>AL.push({k,...a}));
-        // repos quotidien — on ne compare que deux jours travaillés consécutifs
         if(r.deb!=null){
           if(pe!=null&&pk){
             const gapJours=nDays(pk,k);
@@ -801,9 +759,6 @@ function calcPer(start,nb){
   return{Q,AL,G};
 }
 
-/* ═══════════════════════════════════════════════
-   BRUT ESTIMÉ
-═══════════════════════════════════════════════ */
 function brutOf(G){
   const S=DB.s,T=S.taux,L=[];
   const anc=calcAnc(S.emb);
@@ -824,9 +779,6 @@ function brutOf(G){
   return{L,tot,panIR,panIRU,panIRUT};
 }
 
-/* ═══════════════════════════════════════════════
-   NAVIGATION
-═══════════════════════════════════════════════ */
 function tab(t){
   curTab=t;
   ['jour','mois','paie','audit','bul','reg'].forEach(x=>{
@@ -840,7 +792,6 @@ function goDay(n){curDate=addD(curDate,n);renderDay()}
 function goToday(){curDate=today();curMonth=curDate.slice(0,7);renderDay();window.scrollTo(0,0)}
 function setD(f,v){
   const d=gd(curDate);
-  // undo sur changement de type
   if(f==='t'&&d.t!==v)pushUndo('Changement type '+d.t+'→'+v+' le '+short(curDate));
   d[f]=v; save(); renderDay();
 }
@@ -859,15 +810,11 @@ function dupliConfirm(){
   save(); renderDay();
 }
 
-/* ═══════════════════════════════════════════════
-   RENDU — JOUR
-═══════════════════════════════════════════════ */
 function renderDay(){
   const k=curDate,d=gd(k),r=cd(k);
   const isF=isFerie(k),isD=dowN(k)===0;
   $('dLbl').textContent=dow(k).toUpperCase()+' '+k.slice(8)+' '+MON[+k.slice(5,7)-1]+' '+k.slice(0,4)
     +(isF?' ☀️':'')+(isD&&!isF?' 🔵':'')+(k===today()?' • auj.':'');
-  // chips type
   const TYPES={T:'Travail',REPOS:'Repos',NUIT:'Nuit',RC:'RC',CP:'Congé',MAL:'Maladie'};
   $('dType').innerHTML=Object.entries(TYPES).map(([x,l])=>
     `<button class="${d.t===x?'on':''}" onclick="setD('t','${x}')">${l}</button>`).join('');
@@ -901,15 +848,12 @@ function renderDay(){
   }
   $('dWork').innerHTML=h;
   $('dNote').value=d.note||'';
-  // KPIs
-  const nuitH=r.nuit?` <span class="tag i">${F(r.nuit)} nuit</span>`:'';
   $('dKpi').innerHTML=[
     ['Amplitude',F(r.amp)],['TTE',F(r.tte)],['Pauses',F(r.pz)],
     ['IDAJ',r.idaj?F(r.idaj):'—'],['Paniers',(r.ir+r.iru)||'—'],
     ['H. nuit',r.nuit?F(r.nuit):'—']
   ].map(x=>`<div class="kpi"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
   $('dAl').innerHTML=r.al.map(a=>`<div class="al ${a.lvl}">${a.m}</div>`).join('');
-  // Quatorzaine
   const diff=nDays(DB.s.anchor,k);
   const qs=addD(DB.s.anchor,Math.floor(diff/14)*14);
   const o=calcPer(qs,1).Q[0],N=DB.s.base*120,pc=Math.min(100,o.seuil/N*100);
@@ -920,12 +864,9 @@ function renderDay(){
 <span><b>${F(o.seuil)}</b> / ${F(N)}</span>
 <span class="mut">${o.seuil<N?'reste '+F(N-o.seuil)+' avant HS':'🔥 HS : '+F(o.h25)+' à 25% · '+F(o.h50)+' à 50%'}</span>
 </div>`;
-  // Projection
   renderProj(k,qs);
-  // Badge undo
   if(_undo){
     $('undoDesc').textContent=_undo.desc;
-    // petit bouton flottant
   }
 }
 
@@ -933,17 +874,13 @@ function renderProj(k,qs){
   const qEnd=addD(qs,13);
   const today_=today();
   if(k>qEnd||k<qs){$('dProj').innerHTML='<span class="mut">Navigue dans la quatorzaine courante pour voir la projection.</span>';return}
-  // Jours restants dans la quatorzaine
   const restant=nDays(today_,qEnd);
   if(restant<=0){$('dProj').innerHTML='<span class="mut">Quatorzaine terminée.</span>';return}
   $('dProjLbl').textContent=short(qs)+' → '+short(qEnd);
   const o=calcPer(qs,1).Q[0];
   const N=DB.s.base*120;
-  const dejaH25=Math.max(o.seuil-N,0);
-  // Moyenne journalière sur les jours travaillés
   const trav=o.trav||1;
   const moyJ=o.seuil/trav;
-  // Projection : si même rythme les jours restants
   const joursTravRestants=Math.round(restant*trav/(nDays(qs,today_)+1||1));
   const proj=o.seuil+joursTravRestants*moyJ;
   const projH25=Math.min(Math.max(proj-N,0),DB.s.pl*60);
@@ -959,9 +896,6 @@ Projection à rythme constant : <b>${F(Math.round(projH25))}</b> HS 25% · <b>${
 </div>`;
 }
 
-/* ═══════════════════════════════════════════════
-   RENDU — MOIS
-═══════════════════════════════════════════════ */
 function goMonth(n){const d=dOf(curMonth+'-01');d.setMonth(d.getMonth()+n);curMonth=isoOf(d).slice(0,7);renderMonth()}
 function renderMonth(){
   $('mLbl').textContent=MON[+curMonth.slice(5,7)-1]+' '+curMonth.slice(0,4);
@@ -1002,13 +936,11 @@ onclick="curDate='${k}';tab('jour')">
     ['Amplitude',F(G.amp)],['TTE',F(G.tte)],['Jours trav.',G.trav],
     ['Paniers',G.ir+G.iru],['Dimanches',G.dim],['Fériés trav.',G.fer?'oui':'—']
   ].map(x=>`<div class="kpi"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
-  // Graphique
   const max=Math.max(...chartD.map(x=>x.v),1);
   $('mChart').innerHTML=chartD.map(x=>{
     const pct=(x.v/max*100).toFixed(1);
     return `<div class="bar-w"><div class="bv${x.hs?' hs':''}" style="height:${pct}%" title="${short(x.k)} ${F(x.v)}"></div><div class="bl">${+x.k.slice(8)}</div></div>`;
   }).join('');
-  // Dimanches & fériés
   let dimH='';
   const m=curMonth;
   for(let i=1;i<=31;i++){
@@ -1022,11 +954,7 @@ onclick="curDate='${k}';tab('jour')">
   $('mDim').innerHTML=dimH||'<span class="mut">Aucun dimanche ni férié travaillé ce mois.</span>';
 }
 
-/* ═══════════════════════════════════════════════
-   RENDU — PAIE
-═══════════════════════════════════════════════ */
 function goPer(n){
-  // Avancer/reculer d'exactement nb quatorzaines
   DB.per.start=addD(DB.per.start,n*14*DB.per.nb);
   save();renderPay();
 }
@@ -1052,7 +980,6 @@ function renderPay(){
     :'<div class="al w">⚠️ Décalage de '+off+' jour(s) — les HS peuvent être faussées. Ajuste la date de début.</div>')
     +(reg?'<div class="al i">📌 Période enregistrée dans l\'audit</div>':'');
   const{Q,AL,G}=calcPer(st,nb);
-  const anc=calcAnc(S.emb);
   $('pKpi').innerHTML=[
     ['Amplitude',F(G.amp)],['TTE',F(G.tte)],
     ['HS 25 %',F(G.h25),G.h25>0?'warn':''],
@@ -1060,7 +987,6 @@ function renderPay(){
     ['Jours trav.',G.trav],['Paniers',G.ir+G.iru],
     ['Dimanches',G.dim],['IDAJ',C2(G.idaj)+' h']
   ].map(x=>`<div class="kpi ${x[2]||''}"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
-  // Tableau détail
   let h='<tr><th>Détail</th><th class="n">Ampl.</th><th class="n">TTE</th><th class="n">Norm.</th><th class="n">HS 25%</th><th class="n">HS 50%</th></tr>';
   Q.forEach((o,i)=>{
     o.w.forEach((s,j)=>h+=`<tr><td>Sem. ${j+1} — ${short(s.start)}</td><td class="n">${F(s.amp)}</td><td class="n">${F(s.tte)}</td><td class="n mut" colspan="3">${s.trav} j</td></tr>`);
@@ -1068,12 +994,10 @@ function renderPay(){
   });
   h+=`<tr class="t"><td>TOTAL</td><td class="n">${F(G.amp)}</td><td class="n">${F(G.tte)}</td><td class="n">${F(G.nor)}</td><td class="n">${F(G.h25)}</td><td class="n">${F(G.h50)}</td></tr>`;
   $('pTab').innerHTML=h;
-  // Anomalies
   $('pAlCount').textContent=AL.length?AL.length+' alerte(s)':'';
   $('pAl').innerHTML=AL.length
     ?AL.map(a=>`<div class="al ${a.lvl}"><b>${short(a.k)}</b> — ${esc(a.m)}</div>`).join('')
     :'<div class="al k">✅ Aucune anomalie détectée sur cette période</div>';
-  // Brut
   const{L,tot,panIR,panIRU,panIRUT}=brutOf(G);
   $('pBrut').innerHTML='<tr><th>Élément</th><th class="n">Qté</th><th class="n">Taux</th><th class="n">Montant</th></tr>'
     +L.map(x=>`<tr><td>${esc(x[0])}</td><td class="n">${x[1]}</td><td class="n mut">${x[2]}</td><td class="n">${EUR(x[3])}</td></tr>`).join('')
@@ -1083,7 +1007,6 @@ function renderPay(){
     +`<tr><td>IRU brut (${G.iru} repas int.)</td><td colspan="2" class="n mut">${S.iru} €</td><td class="n">+ ${EUR(panIRU)}</td></tr>`
     +`<tr><td>IRU taux plein (${G.iru} repas)</td><td colspan="2" class="n mut">${S.irT} €</td><td class="n">(${EUR(panIRUT)} si taux plein)</td></tr>`
     +`<tr class="t"><td>Total versé estimé</td><td colspan="2"></td><td class="n">${EUR(tot*S.net+panIR+panIRU)}</td></tr>`;
-  // RC
   const d25=Math.max(G.h25/60-B.p25,0),d50=Math.max(G.h50/60-B.p50,0);
   const acq=d25*1.25+d50*1.5,sol=B.rcOld+acq;
   const perdu=d25*S.taux*1.25+d50*S.taux*1.5;
@@ -1102,7 +1025,6 @@ ${Math.abs(ec)<0.1?'✅ RC bulletin conforme au calcul':'🚩 Écart RC : <b>'+e
 💰 Valeur RC non payé : <b>${EUR(perdu)}</b> brut · Solde total : <b>${EUR(sol*S.taux)}</b>
 </div>
 ${sol>S.rcAlerte?`<div class="al b" style="margin-top:6px">🚨 Solde RC > ${S.rcAlerte}h — risque de perte ! Demandez la prise ou le paiement.</div>`:''}`;
-  // Comparaison TTE
   let c='<tr><th>Semaine</th><th class="n">TTE calculé</th><th class="n">TTE bulletin</th><th class="n">Écart</th></tr>';
   Q.forEach(o=>o.w.forEach(s=>{
     const v=DB.cmp[s.start]||'',e=v?P(v)-s.tte:null;
@@ -1113,9 +1035,6 @@ ${sol>S.rcAlerte?`<div class="al b" style="margin-top:6px">🚨 Solde RC > ${S.r
   $('pCmp').innerHTML=c;
 }
 
-/* ═══════════════════════════════════════════════
-   RENDU — AUDIT
-═══════════════════════════════════════════════ */
 function renderAudit(){
   if(!DB.periods.length){
     ['aTab','aKpi','aAnn','aRc'].forEach(id=>$(id).innerHTML='');
@@ -1125,7 +1044,6 @@ function renderAudit(){
   const S=DB.s;
   let T={tte:0,h25:0,h50:0,acq:0,dec:0,ecart:0,fer:[],dim:[],trav:0,nor:0},AA=[];
   let h='<tr><th>Période</th><th class="n">TTE</th><th class="n">HS25</th><th class="n">HS50</th><th class="n">RC calc.</th><th class="n">RC bull.</th><th class="n">Écart</th></tr>';
-  // Résumé par année
   const byYear={};
   DB.periods.forEach(p=>{
     const{G,AL}=calcPer(p.start,p.nb),B=gb(p.start);
@@ -1154,20 +1072,17 @@ function renderAudit(){
     ['Valeur RC',EUR(T.acq*S.taux)],
     ['Écart bulletins',EUR(Math.abs(T.ecart)*S.taux),Math.abs(T.ecart)>0.5?'bad':'']
   ].map(x=>`<div class="kpi ${x[2]||''}"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
-  // Résumé annuel
   let ay='<tr><th>Année</th><th class="n">Jours</th><th class="n">TTE</th><th class="n">HS 25%</th><th class="n">HS 50%</th><th class="n">Brut estimé</th></tr>';
   Object.entries(byYear).sort().forEach(([y,v])=>{
     const brt=v.nor/60*S.taux+(v.h25/60*S.taux*1.25)+(v.h50/60*S.taux*1.5);
     ay+=`<tr><td><b>${y}</b></td><td class="n">${v.trav}</td><td class="n">${F(v.tte)}</td><td class="n">${C2(v.h25)}</td><td class="n">${C2(v.h50)}</td><td class="n">${EUR(brt)}</td></tr>`;
   });
   $('aAnn').innerHTML=ay;
-  // Fériés & dimanches
   $('aFer').innerHTML=(T.fer.length?T.fer.map(k=>{const r=cd(k);
     return `<div class="al w">☀️ <b>${shortY(k)}</b> — ${F(r.tte)} → maj. 100% = <b>${EUR(r.tte/60*S.taux)}</b></div>`}).join('')
     +`<div class="al i">Total fériés : <b>${EUR(T.fer.reduce((a,k)=>a+cd(k).tte/60*S.taux,0))}</b></div>`
     :'<div class="al k">✅ Aucun férié travaillé</div>')
     +(T.dim.length?T.dim.map(k=>`<div class="al w">🔵 <b>${shortY(k)}</b> dimanche travaillé</div>`).join(''):'');
-  // Solde RC cumulé
   const rcSol=T.acq-T.dec;
   const barPct=Math.min(100,rcSol/S.rcAlerte*100);
   $('aRc').innerHTML=`<div class="kpis">
@@ -1178,7 +1093,6 @@ function renderAudit(){
 </div>
 <div class="${rcSol>S.rcAlerte?'bar bad':'bar warn'}" style="margin-top:9px"><i style="width:${barPct.toFixed(1)}%"></i></div>
 ${rcSol>S.rcAlerte?`<div class="al b" style="margin-top:6px">🚨 Solde RC élevé (${rcSol.toFixed(1)}h / seuil ${S.rcAlerte}h) — risque de perdre des heures !</div>`:''}`;
-  // Anomalies
   const crit=AA.filter(a=>a.lvl==='b');
   $('aAl').innerHTML=AA.length
     ?(crit.length?crit:AA).slice(0,50).map(a=>`<div class="al ${a.lvl}"><b>${shortY(a.k)}</b> — ${esc(a.m)}</div>`).join('')
@@ -1186,9 +1100,6 @@ ${rcSol>S.rcAlerte?`<div class="al b" style="margin-top:6px">🚨 Solde RC élev
     :'<div class="al k">✅ Aucune anomalie sur les périodes enregistrées</div>';
 }
 
-/* ═══════════════════════════════════════════════
-   RENDU — RÉGLAGES
-═══════════════════════════════════════════════ */
 const RG={
   rg1:[['taux','Taux horaire (€)'],['net','Coef brut→net'],['dimPrime','Prime dimanche (€)']],
   rg2:[['base','Base hebdo (h)'],['pl','Plafond HS 25%'],['anchor','Ancrage quatorzaine'],['rc','Durée RC (min)'],['cp','Durée CP (min)'],['maxAmp','Alerte amplitude (h)'],['rcAlerte','Seuil alerte RC (h)']],
@@ -1215,18 +1126,16 @@ function renderAll(){
   if(curTab==='audit')renderAudit();
   if(curTab==='bul')renderBulHist();
   if(curTab==='reg')renderReg();
-  // Badge anomalies
   let tot=0;
   DB.periods.forEach(p=>{const{AL}=calcPer(p.start,p.nb);tot+=AL.filter(a=>a.lvl==='b').length});
   const badge=$('hBadge');
   if(tot>0){badge.style.display='';badge.textContent=tot}else badge.style.display='none';
-  // Badge tab audit
   $('t-audit').querySelector('.tb')?.remove();
   if(tot>0){const sp=document.createElement('span');sp.className='tb';sp.textContent=tot;$('t-audit').appendChild(sp)}
 }
 
 /* ═══════════════════════════════════════════════
-   PARSEUR BULLETIN EMPLOYEUR
+   PARSEUR BULLETIN EMPLOYEUR — v2 corrigé
 ═══════════════════════════════════════════════ */
 const PDF_WORKER='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.worker.min.js';
 let _wset=false;
@@ -1267,62 +1176,113 @@ function parseBulletin(){
   const raw=$('bulTxt').value;
   if(!raw.trim()){$('bulOut').innerHTML='<div class="al w">Colle d\'abord le texte du bulletin.</div>';return}
   const t=raw.replace(/\u00a0/g,' ').replace(/\r/g,'\n');
+  const lines=t.split('\n').map(l=>l.trim()).filter(l=>l);
   const S=DB.s;
-  // Extraction des données clés du bulletin
   const bul={};
-  // Mois/année
-  const mM=t.match(/[Pp][ée]riode\s*:?\s*([\w]+)\s+(\d{4})/i)||t.match(/(\d{2})[-\/](\d{4})/);
-  if(mM){
-    // Essayer de déduire mois
-    const moisNoms={janvier:1,février:2,mars:3,avril:4,mai:5,juin:6,juillet:7,août:8,septembre:9,octobre:10,novembre:11,décembre:12};
-    const mn=mM[1]?.toLowerCase();
-    bul.mois=moisNoms[mn]?`${mM[2]}-${pad(moisNoms[mn])}`:mM[1]+'-'+mM[2];
+
+  const moisNoms={janvier:'01',février:'02',mars:'03',avril:'04',mai:'05',juin:'06',
+    juillet:'07',août:'08',aout:'08',septembre:'09',octobre:'10',novembre:'11',décembre:'12',decembre:'12'};
+  for(const l of lines){
+    const m=l.match(/[Pp][ée]riode\s*:?\s*([A-Za-zÀ-ÿ]+)\s+(\d{4})/i);
+    if(m){
+      const mn=moisNoms[m[1].toLowerCase()];
+      if(mn)bul.mois=m[2]+'-'+mn;
+      break;
+    }
+    const m2=l.match(/(\d{2})-(\d{4})/);
+    if(m2&&!bul.mois)bul.mois=m2[2]+'-'+m2[1];
   }
-  // Salarié
-  const nomM=t.match(/Monsieur\s+([A-ZÉÈÊ][\w\s]+ROTH|ROTH[\w\s]+)/i)||t.match(/ROTH\s+MICKAEL/i);
-  bul.nom=nomM?nomM[0].trim():'';
-  // Heures normales
-  const hNorm=t.match(/[Ss]alaire de base\s+([\d\s,.]+)\s+([\d,.]+)\s+([\d\s,.]+)/);
-  if(hNorm){bul.hNorm=parseFloat(hNorm[1].replace(/\s/g,'').replace(',','.'));bul.taux=parseFloat(hNorm[2].replace(',','.'));bul.montNorm=parseFloat(hNorm[3].replace(/\s/g,'').replace(',','.'))}
-  // HS 25%
-  const hs25=t.match(/[Hh]eures\s+suppl[ée]?mentaires?\s*(?:25\s*%|(?:à\s*)?125\s*%)\s+([\d\s,.]+)\s+([\d,.]+)\s+([\d\s,.]+)/);
-  if(hs25){bul.hs25H=parseFloat(hs25[1].replace(/\s/g,'').replace(',','.'));bul.hs25T=parseFloat(hs25[2].replace(',','.'));bul.hs25M=parseFloat(hs25[3].replace(/\s/g,'').replace(',','.'))}
-  // HS 50%
-  const hs50=t.match(/[Hh]eures\s+suppl[ée]?mentaires?\s*(?:50\s*%|(?:à\s*)?150\s*%)\s+([\d\s,.]+)\s+([\d,.]+)\s+([\d\s,.]+)/);
-  if(hs50){bul.hs50H=parseFloat(hs50[1].replace(/\s/g,'').replace(',','.'));bul.hs50T=parseFloat(hs50[2].replace(',','.'));bul.hs50M=parseFloat(hs50[3].replace(/\s/g,'').replace(',','.'))}
-  // Habillage
-  const hab=t.match(/[Hh]abillage[^0-9]*([\d,.]+)[^0-9]*([\d.]+)[^0-9]*([\d\s,.]+)/);
-  if(hab){bul.habH=parseFloat(hab[1].replace(',','.'));bul.habT=parseFloat(hab[2].replace(',','.'));bul.habM=parseFloat(hab[3].replace(/\s/g,'').replace(',','.'))}
-  // IDAJ
-  const idaj=t.match(/[Ii]ndemnit[eé]\s+de\s+d[eé]passement[^0-9]*([\d,.]+)[^0-9]*([\d.]+)[^0-9]*([\d\s,.]+)/);
-  if(idaj){bul.idajH=parseFloat(idaj[1].replace(',','.'));bul.idajM=parseFloat(idaj[3].replace(/\s/g,'').replace(',','.'))}
-  // Repas IR
-  const ir=t.match(/[Ii]ndemnit[eé]\s+de\s+[Rr]epas\s+([\d,.]+)\s+([\d.]+)\s+([\d\s,.]+)/);
-  if(ir){bul.irN=parseFloat(ir[1].replace(',','.'));bul.irT=parseFloat(ir[2].replace(',','.'));bul.irM=parseFloat(ir[3].replace(/\s/g,'').replace(',','.'))}
-  // IRU
-  const iru=t.match(/[Ii]ndemnit[eé]\s+de\s+[Rr]epas\s+unique\s+([\d,.]+)\s+([\d.]+)\s+([\d\s,.]+)/);
-  if(iru){bul.iruN=parseFloat(iru[1].replace(',','.'));bul.iruT=parseFloat(iru[2].replace(',','.'));bul.iruM=parseFloat(iru[3].replace(/\s/g,'').replace(',','.'))}
-  // Brut
-  const brut=t.match(/[Ss]alaire\s+brut\s+([\d\s,.]+)/);
-  if(brut)bul.brut=parseFloat(brut[1].replace(/\s/g,'').replace(',','.'));
-  // Net
-  const net=t.match(/[Nn]et\s+(?:à\s+payer|pay[eé])\s+(?:avant[^0-9]+)?(?:imp[ôo]t[^0-9]+)?\s*([\d\s,.]+)/);
-  if(net)bul.net=parseFloat(net[1].replace(/\s/g,'').replace(',','.'));
-  // Ancienneté
-  const ancM=t.match(/(\d+)\s+ans?\s+et\s+(\d+)\s+mois?/i);
-  if(ancM)bul.ancienneteTxt=ancM[0];
-  // RC
-  const rcM=t.match(/RC\s+cumul[eé][^0-9]*([\d,.]+)[^0-9]*([\d,.]+)/i);
-  if(rcM){bul.rcAvant=parseFloat(rcM[1].replace(',','.'));bul.rcApres=parseFloat(rcM[2].replace(',','.'))}
-  bul.raw=t;
+
+  for(const l of lines){
+    if(/Monsieur|Madame/i.test(l)){bul.nom=l.replace(/Monsieur|Madame/gi,'').trim();break}
+  }
+
+  for(const l of lines){
+    const m=l.match(/(\d+)\s+ans?\s+et\s+(\d+)\s+mois?/i);
+    if(m){bul.ancienneteTxt=m[0];break}
+  }
+
+  function parseNum(s){return parseFloat(s.replace(/\s/g,'').replace(',','.'))||0}
+
+  function numsOfLine(l){
+    const matches=[...l.matchAll(/([\d][\d\s]*(?:[.,]\d+)?)/g)];
+    return matches.map(m=>parseNum(m[0])).filter(n=>!isNaN(n)&&n>0);
+  }
+
+  for(const l of lines){
+    const ns=numsOfLine(l);
+    if(/salaire de base/i.test(l)&&ns.length>=3){
+      bul.hNorm=ns[0];
+      bul.taux=ns[1];
+      bul.montNorm=ns[ns.length-1];
+    }
+    else if(/suppl[ée]?mentaires?\s*25/i.test(l)&&ns.length>=3){
+      bul.hs25H=ns[0];
+      bul.hs25T=ns[1];
+      bul.hs25M=ns[ns.length-1];
+    }
+    else if(/suppl[ée]?mentaires?\s*50/i.test(l)&&ns.length>=3){
+      bul.hs50H=ns[0];
+      bul.hs50T=ns[1];
+      bul.hs50M=ns[ns.length-1];
+    }
+    else if(/habillage/i.test(l)&&!/prime/i.test(l)&&ns.length>=2){
+      bul.habH=ns[0];
+      bul.habT=ns.length>=3?ns[1]:S.habT;
+      bul.habM=ns[ns.length-1];
+    }
+    else if(/d[eé]passement.*amplitude|IDAJ/i.test(l)){
+      const clean=l.replace(/100\s*%/g,'').trim();
+      const ns2=numsOfLine(clean);
+      if(ns2.length>=2){
+        bul.idajH=ns2[0];
+        bul.idajM=ns2[ns2.length-1];
+      }
+    }
+    else if(/^salaire brut/i.test(l)&&ns.length>=1){
+      bul.brut=ns[ns.length-1];
+    }
+    else if(/repas\s+unique/i.test(l)&&ns.length>=2){
+      bul.iruN=ns[0];
+      bul.iruT=ns.length>=3?ns[1]:S.iru;
+      bul.iruM=ns[ns.length-1];
+    }
+    else if(/indemnit[eé]\s+de\s+repas(?!\s+unique)/i.test(l)&&!/unique/i.test(l)){
+      if(ns.length>=2&&!bul.irN){
+        bul.irN=ns[0];
+        bul.irT=ns[1];
+        bul.irM=ns[ns.length-1];
+      } else if(ns.length>=2&&bul.irN&&!bul.irTPlein){
+        bul.irTPlein=ns[1];
+        bul.irMPlein=ns[ns.length-1];
+      }
+    }
+    else if(/net\s+(?:à\s+payer|pay[eé])\s+avant/i.test(l)&&ns.length>=1){
+      bul.netAvant=ns[ns.length-1];
+    }
+    else if(/^net\s+pay[eé]/i.test(l)&&ns.length>=1){
+      bul.net=ns[ns.length-1];
+    }
+    else if(/RC\s+cumul[eé]/i.test(l)&&ns.length>=2){
+      bul.rcAvant=ns[0];
+      bul.rcApres=ns[ns.length-1];
+    }
+    else if(/cong[eé]s?\s+pay[eé]s?\s+ann[eé]e\s+N[^-]/i.test(l)&&ns.length>=1){
+      bul.cpN={acquis:ns[0],pris:ns.length>1?ns[1]:0,solde:ns.length>2?ns[2]:0};
+    }
+  }
+
+  for(const l of lines){
+    const m=l.match(/net\s+pay[eé]\s*:\s*([\d\s,.]+)\s*euros?/i);
+    if(m){bul.net=parseNum(m[1]);break}
+  }
+
   bul.importedAt=new Date().toLocaleDateString('fr-FR');
-  // Stocker
-  const moisKey=bul.mois||'inconnu';
+  const moisKey=bul.mois||('inconnu-'+Date.now());
   const existing=DB.bulletins.findIndex(b=>b.mois===moisKey);
   if(existing>=0)DB.bulletins[existing]=bul;else DB.bulletins.push(bul);
-  DB.bulletins.sort((a,b)=>a.mois<b.mois?-1:1);
+  DB.bulletins.sort((a,b)=>(a.mois||'')>(b.mois||'')?1:-1);
   save();
-  // Afficher le résultat
   afficherBulletin(bul);
   renderBulHist();
 }
@@ -1331,111 +1291,155 @@ function afficherBulletin(bul){
   const S=DB.s;
   $('bulResultCard').style.display='';
   $('bulMois').textContent=bul.mois||'';
-  // Trouver la période correspondante dans nos données
-  // Le mois du bulletin = YYYY-MM, on cherche les journées de ce mois
-  const mKey=bul.mois; // ex "2026-08"
-  let calcTTE=0,calcH25=0,calcH50=0,calcIR=0,calcIRU=0,calcIDSJ=0,calcHab=0,calcFer=0,calcTrav=0;
-  if(mKey&&mKey.match(/^\d{4}-\d{2}$/)){
-    // Calculer depuis nos données sur ce mois civil
-    // Trouver quelle(s) quatorzaine(s) couvre ce mois
+
+  let calcTTE=0,calcH25=0,calcH50=0,calcIR=0,calcIRU=0,calcIDAJ=0,calcHab=0,calcFer=0,calcTrav=0,calcDim=0;
+  const mKey=bul.mois;
+
+  if(mKey&&/^\d{4}-\d{2}$/.test(mKey)){
+    const yr=+mKey.slice(0,4),mo=+mKey.slice(5,7);
     const first=mKey+'-01';
-    const lastD=new Date(+mKey.slice(0,4),+mKey.slice(5,7),0);
-    const last=isoOf(lastD);
-    // Trouver toutes les quatorzaines qui touchent ce mois
-    const anchor=S.anchor;
-    let qs=addD(anchor,Math.floor(nDays(anchor,first)/14)*14);
-    if(qs>first)qs=addD(qs,-14);
-    // Parcourir les jours du mois directement
+    const lastDate=new Date(yr,mo,0);
+    const last=isoOf(lastDate);
+
     let cur=first;
     while(cur<=last){
       const r=cd(cur);
-      calcTTE+=r.tte;calcIR+=r.ir;calcIRU+=r.iru;calcIDSJ+=r.idaj;calcTrav+=r.trav;
-      if(r.fer)calcFer+=r.tte;
+      calcTTE   +=r.tte;
+      calcIR    +=r.ir;
+      calcIRU   +=r.iru;
+      calcIDAJ  +=r.idaj;
+      calcTrav  +=r.trav;
+      if(r.fer)  calcFer+=r.tte;
+      if(r.dim&&r.trav) calcDim++;
       cur=addD(cur,1);
     }
     calcHab=calcTrav*S.hab;
-    // HS : calculer via les quatorzaines qui couvrent ce mois
-    // On prend toutes les quatorzaines dont la fenêtre coupe le mois
-    let qc=qs;
+
+    const anchor=S.anchor;
+    const diffFirst=nDays(anchor,first);
+    let qStart=addD(anchor,Math.floor(diffFirst/14)*14);
+    if(qStart>first)qStart=addD(qStart,-14);
+
+    let qc=qStart;
     while(qc<=last){
       const qEnd=addD(qc,13);
       if(qc<=last&&qEnd>=first){
-        const {Q}=calcPer(qc,1);
+        const{Q}=calcPer(qc,1);
         const o=Q[0];
-        // Prorata si quatorzaine dépasse le mois
-        const dStart=qc<first?first:qc;
-        const dEnd=qEnd>last?last:qEnd;
+        const overlapStart=qc<first?first:qc;
+        const overlapEnd=qEnd>last?last:qEnd;
         const jQuat=nDays(qc,qEnd)+1;
-        const jMois=nDays(dStart,dEnd)+1;
-        const ratio=jMois/jQuat;
+        const jOverlap=nDays(overlapStart,overlapEnd)+1;
+        const ratio=jOverlap/jQuat;
         calcH25+=o.h25*ratio;
         calcH50+=o.h50*ratio;
       }
       qc=addD(qc,14);
+      if(nDays(qStart,qc)>90)break;
     }
   }
-  // Construire le tableau de comparaison
+
   const rows=[];
-  const diff=(bv,cv,label,unit='')=>{
-    if(bv==null)return;
+
+  function addRow(label,bv,cv,unit,info){
+    if(bv==null||isNaN(bv))return;
+    const tol=unit==='€'?0.50:unit==='€/h'?0.01:0.20;
     const d=bv-cv;
-    const ok=Math.abs(d)<0.15;
-    rows.push({label,bul:bv,calc:cv,diff:d,ok,unit});
-  };
-  diff(bul.hNorm,(calcTTE-calcH25-calcH50)/60,'Heures normales','h');
-  if(bul.hs25H!=null)diff(bul.hs25H,calcH25/60,'HS 25%','h');
-  if(bul.hs50H!=null)diff(bul.hs50H,calcH50/60,'HS 50%','h');
-  if(bul.habH!=null)diff(bul.habH,calcHab/60,'Habillage','h');
-  if(bul.idajH!=null)diff(bul.idajH,calcIDSJ/60,'IDAJ','h');
-  if(bul.irN!=null)diff(bul.irN,calcIR,'Paniers IR (ext.)','');
-  if(bul.iruN!=null)diff(bul.iruN,calcIRU,'Paniers IRU (int.)','');
-  if(bul.brut!=null){
-    const calcBrut=calcTTE/60*S.taux+(calcH25/60*S.taux*0.25)+(calcH50/60*S.taux*0.5)+calcHab/60*S.habT+calcIDSJ/60*S.taux+calcFer/60*S.taux;
-    diff(bul.brut,calcBrut,'Salaire brut','€');
+    const ok=Math.abs(d)<=tol;
+    rows.push({label,bul:bv,calc:cv,diff:d,ok,unit,info:info||''});
   }
-  if(bul.taux!=null)diff(bul.taux,S.taux,'Taux horaire','€/h');
-  // KPIs
+
+  const calcNorm=Math.max(calcTTE-calcH25-calcH50,0)/60;
+  addRow('Heures normales',bul.hNorm,calcNorm,'h','Base 35h + CP/RC');
+  if(bul.hs25H!=null)addRow('HS 25%',bul.hs25H,calcH25/60,'h','Heures au-delà des 70h/quatorzaine');
+  if(bul.hs50H!=null)addRow('HS 50%',bul.hs50H,calcH50/60,'h','Heures au-delà du plafond HS 25%');
+  if(bul.habH!=null)addRow('Habillage',bul.habH,calcHab/60,'h',''+calcTrav+' jours × '+S.hab+' min');
+  if(bul.idajH!=null)addRow('IDAJ',bul.idajH,calcIDAJ/60,'h','Dépassement amplitude > '+S.idaj+'h');
+  if(bul.irN!=null)addRow('Paniers IR (ext.)',bul.irN,calcIR,'repas','Pause extérieure couvrant la plage repas');
+  if(bul.iruN!=null)addRow('Paniers IRU (int.)',bul.iruN,calcIRU,'repas','Pause intérieure couvrant la plage repas');
+  if(bul.taux!=null)addRow('Taux horaire',bul.taux,S.taux,'€/h','');
+  if(bul.brut!=null){
+    const calcBrut=
+      calcNorm*S.taux
+      +(calcH25/60)*S.taux*1.25
+      +(calcH50/60)*S.taux*1.5
+      +(calcHab/60)*S.habT
+      +(calcIDAJ/60)*S.taux
+      +calcFer/60*S.taux
+      +(calcDim*S.dimPrime||0);
+    addRow('Salaire brut',bul.brut,calcBrut,'€','');
+  }
+  if(bul.net!=null){
+    const calcNet=(bul.brut||0)*S.net+(calcIR*S.ir)+(calcIRU*S.irT);
+    addRow('Net estimé',bul.net,calcNet,'€','Brut × '+S.net+' + paniers');
+  }
+
   const anomalies=rows.filter(r=>!r.ok);
   $('bulKpi').innerHTML=[
     ['Mois',bul.mois||'?'],
-    ['Salarié',bul.nom?bul.nom.split(' ').slice(-1)[0]:'?'],
-    ['Net payé',bul.net?EUR(bul.net):'?'],
-    ['Brut',bul.brut?EUR(bul.brut):'?'],
-    ['Écarts détectés',anomalies.length,anomalies.length>0?'bad':''],
+    ['Net payé',bul.net!=null?EUR(bul.net):'?',bul.net?'':'warn'],
+    ['Brut',bul.brut!=null?EUR(bul.brut):'?',bul.brut?'':'warn'],
+    ['HS 25%',bul.hs25H!=null?bul.hs25H.toFixed(2)+' h':'?',bul.hs25H?'warn':''],
+    ['Écarts',anomalies.length,anomalies.length>0?'bad':''],
     ['Ancienneté',bul.ancienneteTxt||'?']
   ].map(x=>`<div class="kpi ${x[2]||''}"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
-  // Tableau
-  let tab='<tr><th>Élément</th><th class="n">Bulletin</th><th class="n">Calculé</th><th class="n">Écart</th><th>Statut</th></tr>';
+
+  let tab='<tr><th>Élément</th><th class="n">Bulletin</th><th class="n">Calculé</th><th class="n">Écart</th><th></th></tr>';
   rows.forEach(r=>{
-    const dFmt=r.unit==='€'?EUR(Math.abs(r.diff)):(Math.abs(r.diff).toFixed(2)+' '+r.unit);
-    const bFmt=r.unit==='€'?EUR(r.bul):(r.bul.toFixed(2)+' '+r.unit);
-    const cFmt=r.unit==='€'?EUR(r.calc):(r.calc.toFixed(2)+' '+r.unit);
-    tab+=`<tr>
+    const fmt=(v,u)=>{
+      if(u==='€')return EUR(v);
+      if(u==='€/h')return v.toFixed(4)+' €/h';
+      if(u==='repas')return v.toFixed(0)+' repas';
+      return v.toFixed(2)+' h';
+    };
+    const dAbs=Math.abs(r.diff);
+    const dFmt=(r.diff>0?'+':'-')+fmt(dAbs,r.unit);
+    tab+=`<tr title="${esc(r.info)}">
 <td>${esc(r.label)}</td>
-<td class="n">${bFmt}</td>
-<td class="n">${cFmt}</td>
-<td class="n ${r.ok?'ok':'bad'}">${r.ok?'—':(r.diff>0?'+':'')+dFmt}</td>
+<td class="n">${fmt(r.bul,r.unit)}</td>
+<td class="n">${fmt(r.calc,r.unit)}</td>
+<td class="n ${r.ok?'ok':'bad'}">${r.ok?'✓':dFmt}</td>
 <td>${r.ok?'✅':'🚩'}</td>
 </tr>`;
   });
   $('bulTab').innerHTML=tab;
-  // Alertes
+
   let al='';
   if(anomalies.length===0){
-    al='<div class="al k">✅ Aucune anomalie détectée — le bulletin semble conforme à nos calculs.</div>';
+    al='<div class="al k">✅ Aucun écart significatif — le bulletin semble conforme à nos calculs.</div>';
   } else {
-    al='<div class="al b">🚩 <b>'+anomalies.length+' écart(s) détecté(s)</b> entre le bulletin et nos calculs :</div>';
+    al=`<div class="al b">🚩 <b>${anomalies.length} écart(s) détecté(s)</b> :</div>`;
     anomalies.forEach(r=>{
-      const sens=r.diff>0?'Le bulletin est SUPÉRIEUR':'Le bulletin est INFÉRIEUR';
-      const val=r.unit==='€'?EUR(Math.abs(r.diff)):(Math.abs(r.diff).toFixed(2)+' '+r.unit);
-      al+=`<div class="al b">🚩 <b>${esc(r.label)}</b> : ${sens} au calcul de <b>${val}</b>. Bulletin : ${r.bul.toFixed(2)} · Calculé : ${r.calc.toFixed(2)}</div>`;
+      const fmt=(v,u)=>u==='€'?EUR(v):(v.toFixed(u==='repas'?0:2)+' '+(u==='repas'?'repas':u));
+      const sens=r.diff>0?'bulletin SUPÉRIEUR':'bulletin INFÉRIEUR';
+      const ecart=fmt(Math.abs(r.diff),r.unit);
+      al+=`<div class="al b">🚩 <b>${esc(r.label)}</b> : ${sens} de <b>${ecart}</b>
+<br><span class="mut">Bulletin : ${fmt(r.bul,r.unit)} · Calculé : ${fmt(r.calc,r.unit)}${r.info?' · '+esc(r.info):''}</span></div>`;
     });
-    al+=`<div class="al w" style="margin-top:8px">⚠️ Ces écarts peuvent être dus à des arrondis, à des jours non saisis, ou à une vraie erreur de l'employeur. Vérifiez manuellement chaque ligne.</div>`;
+    al+=`<div class="al w" style="margin-top:6px">
+⚠️ Un écart peut venir d'un arrondi, d'un jour non saisi dans l'appli, ou d'une vraie erreur de l'employeur.<br>
+<b>Tolérance appliquée :</b> ±0,20h pour les durées, ±0,50€ pour les montants, ±0,01€/h pour les taux.
+</div>`;
   }
+
   if(bul.ancienneteTxt){
-    const ancCalc=calcAnc(S.emb);
-    al+=`<div class="al i">👤 Ancienneté bulletin : <b>${bul.ancienneteTxt}</b> — Calculée depuis le ${S.emb} : <b>${ancCalc.y} ans ${ancCalc.m} mois</b> (taux CCN : ${ancCalc.pct}%)</div>`;
+    const ancCalc=calcAnc(S.emb||DEF.emb);
+    const ok2=ancCalc.y===parseInt(bul.ancienneteTxt)||bul.ancienneteTxt.includes(ancCalc.y+' an');
+    al+=`<div class="al ${ok2?'i':'w'}">
+👤 Ancienneté bulletin : <b>${bul.ancienneteTxt}</b>
+— Calculée depuis le ${S.emb} : <b>${ancCalc.y} ans ${ancCalc.m} mois</b>
+(taux CCN auto : <b>${ancCalc.pct}%</b>)
+</div>`;
   }
+
+  if(bul.rcAvant!=null&&bul.rcApres!=null){
+    al+=`<div class="al i">⏱️ RC bulletin : avant <b>${bul.rcAvant.toFixed(2)}h</b> → après <b>${bul.rcApres.toFixed(2)}h</b> (acquis ce mois : <b>${(bul.rcApres-bul.rcAvant).toFixed(2)}h</b>)</div>`;
+  }
+
+  if(bul.cpN){
+    al+=`<div class="al i">🏖️ CP année N — Acquis : <b>${bul.cpN.acquis}</b> · Pris : <b>${bul.cpN.pris}</b> · Solde : <b>${bul.cpN.solde}</b></div>`;
+  }
+
   $('bulAl').innerHTML=al;
   $('bulOut').innerHTML='<div class="al k">✅ Bulletin analysé avec succès.</div>';
 }
@@ -1554,9 +1558,6 @@ function parseBlock(b,st,en){
   return{n,rep,fer,warn};
 }
 
-/* ═══════════════════════════════════════════════
-   IMPORT EXCEL
-═══════════════════════════════════════════════ */
 function excelDate(v){
   if(v==null||v==='')return null;
   if(v instanceof Date)return isoOf(v);
@@ -1627,9 +1628,6 @@ function parseExcel(file){
   reader.readAsArrayBuffer(file);$('fx').value='';
 }
 
-/* ═══════════════════════════════════════════════
-   SAUVEGARDE
-═══════════════════════════════════════════════ */
 function expo(){
   DB.exp=new Date().toLocaleDateString('fr-FR');save();
   const b=new Blob([JSON.stringify(DB,null,1)],{type:'application/json'});
@@ -1668,9 +1666,6 @@ function copySum(){
   navigator.clipboard.writeText(t).then(()=>alert('✅ Résumé copié !'),()=>prompt('Copie :',t));
 }
 
-/* ═══════════════════════════════════════════════
-   INIT
-═══════════════════════════════════════════════ */
 load();
 curDate=today();curMonth=curDate.slice(0,7);
 if(!Object.keys(DB.days).length){
@@ -1678,7 +1673,7 @@ if(!Object.keys(DB.days).length){
 }else{
   renderDay();renderReg();
 }
-// Undo par swipe gauche (optionnel)
+
 let _tx=null;
 document.addEventListener('touchstart',e=>{_tx=e.touches[0].clientX},{passive:true});
 document.addEventListener('touchend',e=>{
@@ -1693,4 +1688,3 @@ if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catc
 </script>
 </body>
 </html>
- 
