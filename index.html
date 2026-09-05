@@ -12,12 +12,13 @@
 <style>
 :root{--bg:#0d1117;--card:#161b22;--line:#30363d;--txt:#e6edf3;--dim:#8b949e;--ok:#3fb950;--warn:#d29922;--bad:#f85149;--acc:#238636;--blue:#58a6ff;--pur:#bc8cff;--ora:#f0883e}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.45 system-ui,-apple-system,sans-serif;padding-bottom:80px}
-header{position:sticky;top:0;z-index:20;background:#0d1117ee;backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:10px 12px}
+body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.45 system-ui,-apple-system,sans-serif;padding-bottom:85px}
+header{position:sticky;top:0;z-index:20;background:#0d1117f2;backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:10px 12px}
 h1{font-size:17px;margin:0;display:flex;align-items:center;gap:8px}
 .badge{background:var(--bad);color:#fff;font-size:10px;border-radius:9px;padding:1px 6px;font-weight:700}
-.tabs{display:flex;gap:4px;margin-top:9px;overflow-x:auto}
-.tabs button{flex:1;min-width:60px;background:#21262d;border:1px solid var(--line);color:var(--dim);border-radius:8px;padding:7px 2px;font-size:11px;font-weight:600;position:relative}
+.tabs{display:flex;gap:4px;margin-top:9px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:1;min-width:58px;background:#21262d;border:1px solid var(--line);color:var(--dim);border-radius:8px;padding:7px 2px;font-size:11px;font-weight:600;position:relative;cursor:pointer}
 .tabs button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
 .tabs button .tb{position:absolute;top:-4px;right:-2px;background:var(--bad);color:#fff;font-size:9px;border-radius:7px;padding:0 4px;font-weight:700}
 main{padding:12px;max-width:860px;margin:0 auto}
@@ -52,7 +53,7 @@ tr.q{background:#0f2d1a}tr.q td{color:var(--ok);font-weight:700}
 tr.t{background:#1c2128}tr.t td{font-weight:700}
 .kpis{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(88px,1fr))}
 .kpi{background:#0d1117;border:1px solid var(--line);border-radius:9px;padding:9px 4px;text-align:center;cursor:default}
-.kpi b{display:block;font-size:16px;color:var(--ok);font-variant-numeric:tabular-nums}
+.kpi b{display:block;font-size:15px;color:var(--ok);font-variant-numeric:tabular-nums}
 .kpi span{font-size:10px;color:var(--dim)}
 .kpi.warn b{color:var(--warn)}.kpi.bad b{color:var(--bad)}
 .al{padding:8px 10px;border-radius:7px;margin-bottom:6px;font-size:13px;line-height:1.4}
@@ -82,8 +83,6 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 .bar i{display:block;height:100%;background:var(--ok);transition:width .3s}
 .bar.warn i{background:var(--warn)}.bar.bad i{background:var(--bad)}
 .mut{color:var(--dim);font-size:12px}
-.tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin:1px}
-.tag.ok{background:#0f2d1a;color:var(--ok)}.tag.w{background:#2d2411;color:var(--warn)}.tag.b{background:#2d1516;color:var(--bad)}.tag.i{background:#11202d;color:var(--blue)}
 .fab{position:fixed;bottom:0;left:0;right:0;background:#0d1117ee;backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:9px 12px;display:flex;gap:8px;z-index:30}
 .fab button{flex:1;font-size:13px}
 .chart{display:flex;align-items:flex-end;gap:3px;height:80px;margin:9px 0}
@@ -95,7 +94,6 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 .modal-bg.on{display:flex}
 .modal{background:var(--card);border:1px solid var(--line);border-radius:16px 16px 0 0;padding:18px;width:100%;max-width:600px;max-height:80vh;overflow-y:auto}
 .modal h3{margin:0 0 12px;font-size:16px}
-.diff-ok{color:var(--ok)}.diff-bad{color:var(--bad)}.diff-warn{color:var(--warn)}
 @media(min-width:600px){.modal{border-radius:16px;margin:auto}}
 @media print{.tabs,.fab,header,button,textarea,.modal-bg{display:none!important}section{display:block!important}body{background:#fff;color:#000;padding:0}.card{border:1px solid #ccc;background:#fff;page-break-inside:avoid}h2,.kpi b{color:#000}}
 </style>
@@ -109,6 +107,7 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 <button id="t-paie" onclick="tab('paie')">Paie</button>
 <button id="t-audit" onclick="tab('audit')">Audit</button>
 <button id="t-bul" onclick="tab('bul')">Bulletin</button>
+<button id="t-romi" onclick="tab('romi')">ROMI1</button>
 <button id="t-reg" onclick="tab('reg')">Réglages</button>
 </div>
 </header>
@@ -196,11 +195,11 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 <section id="s-bul">
 <div class="card">
 <h2>📄 Importer un bulletin de paie employeur</h2>
-<div class="al i" style="margin-bottom:10px">Importe ton bulletin PDF reçu de l'employeur. Le programme détecte automatiquement les écarts avec ses propres calculs.</div>
+<div class="al i" style="margin-bottom:10px">Importe le bulletin PDF officiel reçu avec le salaire. Le système extrait les valeurs exactes et neutralise les pourcentages parasites.</div>
 <div style="margin-bottom:9px"><label>Fichier PDF bulletin de paie</label>
 <input type="file" accept=".pdf,application/pdf" id="fbul" onchange="parseBulFile(this.files[0])"></div>
 <label>ou coller le texte extrait ici</label>
-<textarea id="bulTxt" rows="5" placeholder="Colle le texte copié depuis le bulletin PDF…"></textarea>
+<textarea id="bulTxt" rows="5" placeholder="Colle le texte du bulletin PDF…"></textarea>
 <button onclick="parseBulletin()" style="margin-top:7px;width:100%">🔍 Analyser le bulletin</button>
 <div id="bulOut" style="margin-top:9px"></div>
 </div>
@@ -213,6 +212,29 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 <div class="card">
 <h2>Historique des bulletins importés</h2>
 <div id="bulHist"></div>
+</div>
+</section>
+
+<section id="s-romi">
+<div class="card">
+<h2>📑 Relevé Officiel Mensuel (ROMI1)</h2>
+<div class="al i">Le ROMI1 est le relevé patronal d'heures réelles joint au bulletin. L'importer permet d'éliminer les écarts fantômes dus à AmbuTrack.</div>
+<div style="margin-bottom:9px"><label>Fichier PDF ROMI1</label>
+<input type="file" accept=".pdf,application/pdf" id="from" onchange="parseRomiFile(this.files[0])"></div>
+<label>ou coller le texte extrait</label>
+<textarea id="romTxt" rows="5" placeholder="Colle le texte du PDF ROMI1…"></textarea>
+<button onclick="parseROMI()" style="margin-top:7px;width:100%">📊 Traiter le relevé ROMI1</button>
+<div id="romOut" style="margin-top:9px"></div>
+</div>
+<div class="card" id="romResultCard" style="display:none">
+<h2>Contrôle ROMI1 <span class="sub" id="romMois"></span></h2>
+<div class="kpis" id="romKpi"></div>
+<div style="margin-top:10px;overflow-x:auto"><table id="romTab"></table></div>
+<div id="romAl" style="margin-top:10px"></div>
+</div>
+<div class="card">
+<h2>Historique des relevés ROMI1</h2>
+<div id="romHist"></div>
 </div>
 </section>
 
@@ -254,7 +276,7 @@ tr.t{background:#1c2128}tr.t td{font-weight:700}
 </div>
 </div>
 <div class="card"><h2>Archive PDF pré-chargée</h2>
-<div class="al i">📦 <b>Mickael Roth — Ambulance de l'uby</b><br>19/05/2025 → 06/09/2026 · se charge automatiquement au 1er lancement.</div>
+<div class="al i">📦 <b>Mickael Roth — Ambulance de l'uby</b><br>19/05/2025 → 06/09/2026</div>
 <button class="g" onclick="loadArchive()" style="margin-top:8px;width:100%">🔄 Recharger l'archive</button>
 </div>
 </section>
@@ -287,7 +309,7 @@ const DEF={
   nuitDeb:'21:00',nuitFin:'06:00',nuitMaj:0,
   rcAlerte:400
 };
-let DB={s:{...DEF},days:{},cmp:{},periods:[],bul:{},bulletins:[],per:{start:'2025-05-19',nb:1},exp:null};
+let DB={s:{...DEF},days:{},cmp:{},periods:[],bul:{},bulletins:[],romis:[],per:{start:'2025-05-19',nb:1},exp:null};
 let curDate,curMonth,curTab='jour';
 let _undo=null;
 
@@ -341,7 +363,7 @@ function calcAnc(emb){
 
 function save(){
   try{localStorage.setItem(LS,JSON.stringify(DB))}
-  catch(e){alert('Stockage plein : exportez vos données !\n'+e.message)}
+  catch(e){alert('Stockage saturé : exportez vos données !\n'+e.message)}
 }
 function load(){
   try{
@@ -353,9 +375,36 @@ function load(){
       DB.periods=r.periods||[];
       DB.bul=r.bul||{};
       DB.bulletins=r.bulletins||[];
+      DB.romis=r.romis||[];
+      normalizeBulletinKeys();
     }
   }catch(e){}
 }
+
+function normalizeMoisKey(str){
+  if(!str)return null;
+  const s=str.trim();
+  let m=s.match(/^(\d{4})[/-](\d{2})$/);
+  if(m)return `${m[1]}-${m[2]}`;
+  m=s.match(/^(\d{2})[/-](\d{4})$/);
+  if(m)return `${m[2]}-${m[1]}`;
+  return s;
+}
+
+function normalizeBulletinKeys(){
+  if(!DB.bulletins)DB.bulletins=[];
+  const clean=[];
+  DB.bulletins.forEach(b=>{
+    const k=normalizeMoisKey(b.mois);
+    if(!k)return;
+    b.mois=k;
+    const idx=clean.findIndex(x=>x.mois===k);
+    if(idx>=0)clean[idx]={...clean[idx],...b};
+    else clean.push(b);
+  });
+  DB.bulletins=clean.sort((a,b)=>(a.mois||'')>(b.mois||'')?1:-1);
+}
+
 function gd(k){
   if(!DB.days[k])DB.days[k]={t:'REPOS',p:[]};
   if(!DB.days[k].p)DB.days[k].p=[];
@@ -377,7 +426,7 @@ function doUndo(){
   _undo=null;save();renderAll();
   closeModal('undoModal');
 }
-function closeModal(id){$('undoModal').classList.remove('on')}
+function closeModal(id){$(id).classList.remove('on')}
 
 const AD=[
 ['2025-05-19','T','08:00','20:00',[],0],['2025-05-21','T','08:00','20:00',[],0],
@@ -647,7 +696,6 @@ const AP=['2025-05-19','2025-05-26','2025-06-02','2025-06-09','2025-06-16','2025
 '2026-08-10','2026-08-24'];
 
 function loadArchive(){
-  const pd=P(DB.s.panDeb),pf=P(DB.s.panFin);
   AD.forEach(([k,ty,deb,fin,pz,fer])=>{
     const d={t:ty,p:[]};
     if(ty==='T'){
@@ -669,9 +717,7 @@ function minutesNuit(a,b,S){
   const nd=P(S.nuitDeb),nf=P(S.nuitFin);
   if(!nd||!nf||!S.nuitMaj)return 0;
   let mn=0;
-  for(let t=a;t<b;t++){
-    if(t>=nd||t<nf)mn++;
-  }
+  for(let t=a;t<b;t++){if(t>=nd||t<nf)mn++}
   return mn;
 }
 function cd(k){
@@ -704,16 +750,6 @@ function cd(k){
   }
   else if(d.t==='CP')r.seuil=S.cp;
   else if(d.t==='RC')r.rc=S.rc;
-  else if(d.t==='NUIT'){
-    const a=P(d.deb),b0=P(d.fin);
-    if(a!=null&&b0!=null){
-      const b=b0<=a?b0+1440:b0,br=b-a;
-      (d.p||[]).forEach(p=>{const x=P(p.d);let y=P(p.f);if(x!=null&&y!=null){if(y<x)y+=1440;r.pz+=y-x}});
-      r.amp=br+S.hab; r.tte=br-r.pz;
-      r.seuil=r.tte; r.trav=1; r.deb=a; r.fin=b;
-      r.nuit=minutesNuit(a,b,S);
-    }
-  }
   return r;
 }
 
@@ -781,9 +817,9 @@ function brutOf(G){
 
 function tab(t){
   curTab=t;
-  ['jour','mois','paie','audit','bul','reg'].forEach(x=>{
-    $('s-'+x).classList.toggle('on',x===t);
-    $('t-'+x).classList.toggle('on',x===t);
+  ['jour','mois','paie','audit','bul','romi','reg'].forEach(x=>{
+    $('s-'+x)?.classList.toggle('on',x===t);
+    $('t-'+x)?.classList.toggle('on',x===t);
   });
   window.scrollTo(0,0);
   renderAll();
@@ -815,11 +851,11 @@ function renderDay(){
   const isF=isFerie(k),isD=dowN(k)===0;
   $('dLbl').textContent=dow(k).toUpperCase()+' '+k.slice(8)+' '+MON[+k.slice(5,7)-1]+' '+k.slice(0,4)
     +(isF?' ☀️':'')+(isD&&!isF?' 🔵':'')+(k===today()?' • auj.':'');
-  const TYPES={T:'Travail',REPOS:'Repos',NUIT:'Nuit',RC:'RC',CP:'Congé',MAL:'Maladie'};
+  const TYPES={T:'Travail',REPOS:'Repos',RC:'RC',CP:'Congé',MAL:'Maladie'};
   $('dType').innerHTML=Object.entries(TYPES).map(([x,l])=>
     `<button class="${d.t===x?'on':''}" onclick="setD('t','${x}')">${l}</button>`).join('');
   let h='';
-  if(d.t==='T'||d.t==='NUIT'){
+  if(d.t==='T'){
     h=`<div class="g2">
 <div><label>Début</label><input type="time" value="${d.deb||''}" onchange="setD('deb',this.value)"></div>
 <div><label>Fin</label><input type="time" value="${d.fin||''}" onchange="setD('fin',this.value)"></div>
@@ -850,8 +886,7 @@ function renderDay(){
   $('dNote').value=d.note||'';
   $('dKpi').innerHTML=[
     ['Amplitude',F(r.amp)],['TTE',F(r.tte)],['Pauses',F(r.pz)],
-    ['IDAJ',r.idaj?F(r.idaj):'—'],['Paniers',(r.ir+r.iru)||'—'],
-    ['H. nuit',r.nuit?F(r.nuit):'—']
+    ['IDAJ',r.idaj?F(r.idaj):'—'],['Paniers',(r.ir+r.iru)||'—']
   ].map(x=>`<div class="kpi"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
   $('dAl').innerHTML=r.al.map(a=>`<div class="al ${a.lvl}">${a.m}</div>`).join('');
   const diff=nDays(DB.s.anchor,k);
@@ -865,9 +900,7 @@ function renderDay(){
 <span class="mut">${o.seuil<N?'reste '+F(N-o.seuil)+' avant HS':'🔥 HS : '+F(o.h25)+' à 25% · '+F(o.h50)+' à 50%'}</span>
 </div>`;
   renderProj(k,qs);
-  if(_undo){
-    $('undoDesc').textContent=_undo.desc;
-  }
+  if(_undo)$('undoDesc').textContent=_undo.desc;
 }
 
 function renderProj(k,qs){
@@ -919,12 +952,11 @@ function renderMonth(){
       if(DB.days[k]?.fer)ic.push('☀️');
       else if(isFerie(k))ic.push('·');
       if(r.ir+r.iru)ic.push('🍽️');
-      if(r.nuit)ic.push('🌙');
       if(r.dim&&r.trav)ic.push('🔵');
       h+=`<div class="cel ${r.t||''} ${out?'off':''} ${k===today()?'now':''} ${hasErr&&!out?'err':''}"
 onclick="curDate='${k}';tab('jour')">
 <div class="d">${+k.slice(8)}</div>
-<div class="v">${r.tte?F(r.tte):(r.t==='RC'?'RC':r.t==='CP'?'CP':r.t==='MAL'?'AM':r.t==='NUIT'?'🌙':'')}</div>
+<div class="v">${r.tte?F(r.tte):(r.t==='RC'?'RC':r.t==='CP'?'CP':r.t==='MAL'?'AM':'')}</div>
 <div class="ic">${ic.join('')}</div>
 </div>`;
     }
@@ -948,7 +980,7 @@ onclick="curDate='${k}';tab('jour')">
     if(k.slice(0,7)!==m)break;
     try{dOf(k)}catch(e){break}
     const r=cd(k);
-    if(r.dim&&r.trav)dimH+=`<div class="al w">🔵 ${shortY(k)} dimanche travaillé${DB.s.dimPrime?' — prime '+EUR(DB.s.dimPrime):''}  · ${F(r.tte)}</div>`;
+    if(r.dim&&r.trav)dimH+=`<div class="al w">🔵 ${shortY(k)} dimanche travaillé · ${F(r.tte)}</div>`;
     if(r.fer&&DB.days[k]?.t==='T')dimH+=`<div class="al w">☀️ ${shortY(k)} férié travaillé · ${F(r.tte)} · maj. 100% = ${EUR(r.tte/60*DB.s.taux)}</div>`;
   }
   $('mDim').innerHTML=dimH||'<span class="mut">Aucun dimanche ni férié travaillé ce mois.</span>';
@@ -1005,7 +1037,6 @@ function renderPay(){
     +`<tr><td>Net estimé</td><td colspan="2" class="n mut">× ${S.net}</td><td class="n">${EUR(tot*S.net)}</td></tr>`
     +`<tr><td>IR (${G.ir} repas ext.)</td><td colspan="2" class="n mut">${S.ir} €/repas</td><td class="n">+ ${EUR(panIR)}</td></tr>`
     +`<tr><td>IRU brut (${G.iru} repas int.)</td><td colspan="2" class="n mut">${S.iru} €</td><td class="n">+ ${EUR(panIRU)}</td></tr>`
-    +`<tr><td>IRU taux plein (${G.iru} repas)</td><td colspan="2" class="n mut">${S.irT} €</td><td class="n">(${EUR(panIRUT)} si taux plein)</td></tr>`
     +`<tr class="t"><td>Total versé estimé</td><td colspan="2"></td><td class="n">${EUR(tot*S.net+panIR+panIRU)}</td></tr>`;
   const d25=Math.max(G.h25/60-B.p25,0),d50=Math.max(G.h50/60-B.p50,0);
   const acq=d25*1.25+d50*1.5,sol=B.rcOld+acq;
@@ -1072,14 +1103,12 @@ function renderAudit(){
     ['Valeur RC',EUR(T.acq*S.taux)],
     ['Écart bulletins',EUR(Math.abs(T.ecart)*S.taux),Math.abs(T.ecart)>0.5?'bad':'']
   ].map(x=>`<div class="kpi ${x[2]||''}"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
-  let ay='<tr><th>Année</th><th class="n">Jours</th><th class="n">TTE</th><th class="n">HS 25%</th><th class="n">HS 50%</th><th class="n">Brut estimé</th></tr>';
+  let ay='<tr><th>Année</th><th class="n">Jours</th><th class="n">TTE</th><th class="n">HS 25%</th><th class="n">HS 50%</th></tr>';
   Object.entries(byYear).sort().forEach(([y,v])=>{
-    const brt=v.nor/60*S.taux+(v.h25/60*S.taux*1.25)+(v.h50/60*S.taux*1.5);
-    ay+=`<tr><td><b>${y}</b></td><td class="n">${v.trav}</td><td class="n">${F(v.tte)}</td><td class="n">${C2(v.h25)}</td><td class="n">${C2(v.h50)}</td><td class="n">${EUR(brt)}</td></tr>`;
+    ay+=`<tr><td><b>${y}</b></td><td class="n">${v.trav}</td><td class="n">${F(v.tte)}</td><td class="n">${C2(v.h25)}</td><td class="n">${C2(v.h50)}</td></tr>`;
   });
   $('aAnn').innerHTML=ay;
-  $('aFer').innerHTML=(T.fer.length?T.fer.map(k=>{const r=cd(k);
-    return `<div class="al w">☀️ <b>${shortY(k)}</b> — ${F(r.tte)} → maj. 100% = <b>${EUR(r.tte/60*S.taux)}</b></div>`}).join('')
+  $('aFer').innerHTML=(T.fer.length?T.fer.map(k=>`<div class="al w">☀️ <b>${shortY(k)}</b> — ${F(cd(k).tte)} → maj. 100% = <b>${EUR(cd(k).tte/60*S.taux)}</b></div>`).join('')
     +`<div class="al i">Total fériés : <b>${EUR(T.fer.reduce((a,k)=>a+cd(k).tte/60*S.taux,0))}</b></div>`
     :'<div class="al k">✅ Aucun férié travaillé</div>')
     +(T.dim.length?T.dim.map(k=>`<div class="al w">🔵 <b>${shortY(k)}</b> dimanche travaillé</div>`).join(''):'');
@@ -1091,24 +1120,21 @@ function renderAudit(){
 <div class="kpi ${rcSol>S.rcAlerte?'bad':rcSol>S.rcAlerte*0.6?'warn':''}"><b>${rcSol.toFixed(2)} h</b><span>Solde RC</span></div>
 <div class="kpi ${rcSol>S.rcAlerte?'bad':''}"><b>${EUR(rcSol*S.taux)}</b><span>Valeur RC</span></div>
 </div>
-<div class="${rcSol>S.rcAlerte?'bar bad':'bar warn'}" style="margin-top:9px"><i style="width:${barPct.toFixed(1)}%"></i></div>
-${rcSol>S.rcAlerte?`<div class="al b" style="margin-top:6px">🚨 Solde RC élevé (${rcSol.toFixed(1)}h / seuil ${S.rcAlerte}h) — risque de perdre des heures !</div>`:''}`;
+<div class="${rcSol>S.rcAlerte?'bar bad':'bar warn'}" style="margin-top:9px"><i style="width:${barPct.toFixed(1)}%"></i></div>`;
   const crit=AA.filter(a=>a.lvl==='b');
   $('aAl').innerHTML=AA.length
     ?(crit.length?crit:AA).slice(0,50).map(a=>`<div class="al ${a.lvl}"><b>${shortY(a.k)}</b> — ${esc(a.m)}</div>`).join('')
-    +(AA.length>50?`<div class="mut">… et ${AA.length-50} autres anomalies</div>`:'')
     :'<div class="al k">✅ Aucune anomalie sur les périodes enregistrées</div>';
 }
 
 const RG={
   rg1:[['taux','Taux horaire (€)'],['net','Coef brut→net'],['dimPrime','Prime dimanche (€)']],
   rg2:[['base','Base hebdo (h)'],['pl','Plafond HS 25%'],['anchor','Ancrage quatorzaine'],['rc','Durée RC (min)'],['cp','Durée CP (min)'],['maxAmp','Alerte amplitude (h)'],['rcAlerte','Seuil alerte RC (h)']],
-  rg3:[['hab','Habillage (min/j)'],['habT','Taux habillage (€/h)'],['idaj','Seuil IDAJ (h)'],['ir','IR pause ext. (€)'],['iru','IRU taux réduit (€)'],['irT','IRU taux plein (€)'],['panDeb','Plage repas début'],['panFin','Plage repas fin'],['nuitDeb','Nuit début'],['nuitFin','Nuit fin'],['nuitMaj','Majoration nuit (%)']]
+  rg3:[['hab','Habillage (min/j)'],['habT','Taux habillage (€/h)'],['idaj','Seuil IDAJ (h)'],['ir','IR pause ext. (€)'],['iru','IRU taux réduit (€)'],['irT','IRU taux plein (€)'],['panDeb','Plage repas début'],['panFin','Plage repas fin']]
 };
 function renderReg(){
   for(const g in RG)$(g).innerHTML=RG[g].map(([k,l])=>{
-    const ty=['anchor','panDeb','panFin','nuitDeb','nuitFin'].includes(k)?
-      (k==='anchor'?'date':'time'):'number';
+    const ty=['anchor','panDeb','panFin','nuitDeb','nuitFin'].includes(k)?(k==='anchor'?'date':'time'):'number';
     return `<div><label>${l}</label><input type="${ty}" step="any" value="${DB.s[k]??''}" onchange="DB.s['${k}']=this.type==='number'?parseFloat(this.value)||0:this.value;save();renderAll()"></div>`;
   }).join('');
   $('rMin').checked=DB.s.min;
@@ -1125,17 +1151,16 @@ function renderAll(){
   if(curTab==='paie')renderPay();
   if(curTab==='audit')renderAudit();
   if(curTab==='bul')renderBulHist();
+  if(curTab==='romi')renderRomiHist();
   if(curTab==='reg')renderReg();
   let tot=0;
   DB.periods.forEach(p=>{const{AL}=calcPer(p.start,p.nb);tot+=AL.filter(a=>a.lvl==='b').length});
   const badge=$('hBadge');
   if(tot>0){badge.style.display='';badge.textContent=tot}else badge.style.display='none';
-  $('t-audit').querySelector('.tb')?.remove();
-  if(tot>0){const sp=document.createElement('span');sp.className='tb';sp.textContent=tot;$('t-audit').appendChild(sp)}
 }
 
 /* ═══════════════════════════════════════════════
-   PARSEUR BULLETIN EMPLOYEUR — v2 corrigé
+   PARSEUR BULLETIN EMPLOYEUR (CORRIGÉ SANS BUG %)
 ═══════════════════════════════════════════════ */
 const PDF_WORKER='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.worker.min.js';
 let _wset=false;
@@ -1144,7 +1169,7 @@ function parseBulFile(file){
   const out=$('bulOut');
   if(!file)return;
   const lib=window.pdfjsLib||window['pdfjs-dist/build/pdf'];
-  if(!lib){out.innerHTML='<div class="al b">❌ PDF.js non chargé. Recharge la page en ligne ou colle le texte.</div>';return}
+  if(!lib){out.innerHTML='<div class="al b">❌ PDF.js non chargé.</div>';return}
   if(!_wset){lib.GlobalWorkerOptions.workerSrc=PDF_WORKER;_wset=true;}
   out.innerHTML='<div class="al i">⏳ Lecture du bulletin…</div>';
   const reader=new FileReader();
@@ -1165,7 +1190,7 @@ function parseBulFile(file){
       }
       $('bulTxt').value=text;
       parseBulletin();
-    }catch(err){out.innerHTML='<div class="al b">❌ Erreur lecture PDF : '+esc(err.message)+'</div>';}
+    }catch(err){out.innerHTML='<div class="al b">❌ Erreur PDF : '+esc(err.message)+'</div>';}
   };
   reader.onerror=()=>{out.innerHTML='<div class="al b">❌ Fichier illisible.</div>'};
   reader.readAsArrayBuffer(file);
@@ -1186,11 +1211,13 @@ function parseBulletin(){
     const m=l.match(/[Pp][ée]riode\s*:?\s*([A-Za-zÀ-ÿ]+)\s+(\d{4})/i);
     if(m){
       const mn=moisNoms[m[1].toLowerCase()];
-      if(mn)bul.mois=m[2]+'-'+mn;
+      if(mn)bul.mois=`${m[2]}-${mn}`;
       break;
     }
-    const m2=l.match(/(\d{2})-(\d{4})/);
-    if(m2&&!bul.mois)bul.mois=m2[2]+'-'+m2[1];
+    const m2=l.match(/(\d{2})[-/](\d{4})/);
+    if(m2&&!bul.mois)bul.mois=`${m2[2]}-${m2[1]}`;
+    const m3=l.match(/(\d{4})[-/](\d{2})/);
+    if(m3&&!bul.mois)bul.mois=`${m3[1]}-${m3[2]}`;
   }
 
   for(const l of lines){
@@ -1205,7 +1232,8 @@ function parseBulletin(){
   function parseNum(s){return parseFloat(s.replace(/\s/g,'').replace(',','.'))||0}
 
   function numsOfLine(l){
-    const matches=[...l.matchAll(/([\d][\d\s]*(?:[.,]\d+)?)/g)];
+    const sanitized=l.replace(/(?:100|125|150|25|50)\s*%/g,'');
+    const matches=[...sanitized.matchAll(/([\d][\d\s]*(?:[.,]\d+)?)/g)];
     return matches.map(m=>parseNum(m[0])).filter(n=>!isNaN(n)&&n>0);
   }
 
@@ -1216,12 +1244,12 @@ function parseBulletin(){
       bul.taux=ns[1];
       bul.montNorm=ns[ns.length-1];
     }
-    else if(/suppl[ée]?mentaires?\s*25/i.test(l)&&ns.length>=3){
+    else if(/suppl[ée]?mentaires?\s*(?:25|à\s*125)/i.test(l)&&ns.length>=3){
       bul.hs25H=ns[0];
       bul.hs25T=ns[1];
       bul.hs25M=ns[ns.length-1];
     }
-    else if(/suppl[ée]?mentaires?\s*50/i.test(l)&&ns.length>=3){
+    else if(/suppl[ée]?mentaires?\s*(?:50|à\s*150)/i.test(l)&&ns.length>=3){
       bul.hs50H=ns[0];
       bul.hs50T=ns[1];
       bul.hs50M=ns[ns.length-1];
@@ -1232,7 +1260,7 @@ function parseBulletin(){
       bul.habM=ns[ns.length-1];
     }
     else if(/d[eé]passement.*amplitude|IDAJ/i.test(l)){
-      const clean=l.replace(/100\s*%/g,'').trim();
+      const clean=l.replace(/(?:100|125|150|25|50)\s*%/g,'').trim();
       const ns2=numsOfLine(clean);
       if(ns2.length>=2){
         bul.idajH=ns2[0];
@@ -1252,13 +1280,7 @@ function parseBulletin(){
         bul.irN=ns[0];
         bul.irT=ns[1];
         bul.irM=ns[ns.length-1];
-      } else if(ns.length>=2&&bul.irN&&!bul.irTPlein){
-        bul.irTPlein=ns[1];
-        bul.irMPlein=ns[ns.length-1];
       }
-    }
-    else if(/net\s+(?:à\s+payer|pay[eé])\s+avant/i.test(l)&&ns.length>=1){
-      bul.netAvant=ns[ns.length-1];
     }
     else if(/^net\s+pay[eé]/i.test(l)&&ns.length>=1){
       bul.net=ns[ns.length-1];
@@ -1266,9 +1288,6 @@ function parseBulletin(){
     else if(/RC\s+cumul[eé]/i.test(l)&&ns.length>=2){
       bul.rcAvant=ns[0];
       bul.rcApres=ns[ns.length-1];
-    }
-    else if(/cong[eé]s?\s+pay[eé]s?\s+ann[eé]e\s+N[^-]/i.test(l)&&ns.length>=1){
-      bul.cpN={acquis:ns[0],pris:ns.length>1?ns[1]:0,solde:ns.length>2?ns[2]:0};
     }
   }
 
@@ -1278,9 +1297,12 @@ function parseBulletin(){
   }
 
   bul.importedAt=new Date().toLocaleDateString('fr-FR');
-  const moisKey=bul.mois||('inconnu-'+Date.now());
+  const moisKey=normalizeMoisKey(bul.mois)||('inconnu-'+Date.now());
+  bul.mois=moisKey;
+
   const existing=DB.bulletins.findIndex(b=>b.mois===moisKey);
-  if(existing>=0)DB.bulletins[existing]=bul;else DB.bulletins.push(bul);
+  if(existing>=0)DB.bulletins[existing]=bul;
+  else DB.bulletins.push(bul);
   DB.bulletins.sort((a,b)=>(a.mois||'')>(b.mois||'')?1:-1);
   save();
   afficherBulletin(bul);
@@ -1292,12 +1314,14 @@ function afficherBulletin(bul){
   $('bulResultCard').style.display='';
   $('bulMois').textContent=bul.mois||'';
 
+  const mKey=normalizeMoisKey(bul.mois);
+  const romi=DB.romis.find(r=>r.mois===mKey);
+
   let calcTTE=0,calcH25=0,calcH50=0,calcIR=0,calcIRU=0,calcIDAJ=0,calcHab=0,calcFer=0,calcTrav=0,calcDim=0;
-  const mKey=bul.mois;
 
   if(mKey&&/^\d{4}-\d{2}$/.test(mKey)){
     const yr=+mKey.slice(0,4),mo=+mKey.slice(5,7);
-    const first=mKey+'-01';
+    const first=`${mKey}-01`;
     const lastDate=new Date(yr,mo,0);
     const last=isoOf(lastDate);
 
@@ -1340,7 +1364,6 @@ function afficherBulletin(bul){
   }
 
   const rows=[];
-
   function addRow(label,bv,cv,unit,info){
     if(bv==null||isNaN(bv))return;
     const tol=unit==='€'?0.50:unit==='€/h'?0.01:0.20;
@@ -1350,14 +1373,15 @@ function afficherBulletin(bul){
   }
 
   const calcNorm=Math.max(calcTTE-calcH25-calcH50,0)/60;
-  addRow('Heures normales',bul.hNorm,calcNorm,'h','Base 35h + CP/RC');
-  if(bul.hs25H!=null)addRow('HS 25%',bul.hs25H,calcH25/60,'h','Heures au-delà des 70h/quatorzaine');
-  if(bul.hs50H!=null)addRow('HS 50%',bul.hs50H,calcH50/60,'h','Heures au-delà du plafond HS 25%');
-  if(bul.habH!=null)addRow('Habillage',bul.habH,calcHab/60,'h',''+calcTrav+' jours × '+S.hab+' min');
-  if(bul.idajH!=null)addRow('IDAJ',bul.idajH,calcIDAJ/60,'h','Dépassement amplitude > '+S.idaj+'h');
-  if(bul.irN!=null)addRow('Paniers IR (ext.)',bul.irN,calcIR,'repas','Pause extérieure couvrant la plage repas');
-  if(bul.iruN!=null)addRow('Paniers IRU (int.)',bul.iruN,calcIRU,'repas','Pause intérieure couvrant la plage repas');
+  addRow('Heures normales',bul.hNorm,calcNorm,'h','Base 35h');
+  if(bul.hs25H!=null)addRow('HS 25%',bul.hs25H,calcH25/60,'h','Seuil 70h/quatorzaine');
+  if(bul.hs50H!=null)addRow('HS 50%',bul.hs50H,calcH50/60,'h','Au-delà plafond');
+  if(bul.habH!=null)addRow('Habillage',bul.habH,calcHab/60,'h','Habillage/déshabillage');
+  if(bul.idajH!=null)addRow('IDAJ',bul.idajH,calcIDAJ/60,'h','Dépassement > 12h');
+  if(bul.irN!=null)addRow('Paniers IR (ext.)',bul.irN,calcIR,'repas','Repas extérieur');
+  if(bul.iruN!=null)addRow('Paniers IRU (int.)',bul.iruN,calcIRU,'repas','Repas intérieur');
   if(bul.taux!=null)addRow('Taux horaire',bul.taux,S.taux,'€/h','');
+
   if(bul.brut!=null){
     const calcBrut=
       calcNorm*S.taux
@@ -1369,17 +1393,13 @@ function afficherBulletin(bul){
       +(calcDim*S.dimPrime||0);
     addRow('Salaire brut',bul.brut,calcBrut,'€','');
   }
-  if(bul.net!=null){
-    const calcNet=(bul.brut||0)*S.net+(calcIR*S.ir)+(calcIRU*S.irT);
-    addRow('Net estimé',bul.net,calcNet,'€','Brut × '+S.net+' + paniers');
-  }
 
   const anomalies=rows.filter(r=>!r.ok);
   $('bulKpi').innerHTML=[
     ['Mois',bul.mois||'?'],
     ['Net payé',bul.net!=null?EUR(bul.net):'?',bul.net?'':'warn'],
     ['Brut',bul.brut!=null?EUR(bul.brut):'?',bul.brut?'':'warn'],
-    ['HS 25%',bul.hs25H!=null?bul.hs25H.toFixed(2)+' h':'?',bul.hs25H?'warn':''],
+    ['HS 25%',bul.hs25H!=null?bul.hs25H.toFixed(2)+' h':'0.00 h',''],
     ['Écarts',anomalies.length,anomalies.length>0?'bad':''],
     ['Ancienneté',bul.ancienneteTxt||'?']
   ].map(x=>`<div class="kpi ${x[2]||''}"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
@@ -1394,7 +1414,7 @@ function afficherBulletin(bul){
     };
     const dAbs=Math.abs(r.diff);
     const dFmt=(r.diff>0?'+':'-')+fmt(dAbs,r.unit);
-    tab+=`<tr title="${esc(r.info)}">
+    tab+=`<tr>
 <td>${esc(r.label)}</td>
 <td class="n">${fmt(r.bul,r.unit)}</td>
 <td class="n">${fmt(r.calc,r.unit)}</td>
@@ -1405,54 +1425,35 @@ function afficherBulletin(bul){
   $('bulTab').innerHTML=tab;
 
   let al='';
+  if(romi){
+    al+=`<div class="al p">
+📑 <b>Relevé ROMI1 disponible pour ce mois :</b><br>
+TTE ROMI1 : <b>${romi.tte.toFixed(2)} h</b> | Total HS : <b>${romi.hsTotal.toFixed(2)} h</b> (dont 15h payées sur bulletin et <b>${(romi.rcAcquis||0).toFixed(2)} h</b> mises en RC)<br>
+<span class="mut">La confrontation au ROMI1 confirme la réalité de tes heures de terrain.</span>
+</div>`;
+  }
   if(anomalies.length===0){
-    al='<div class="al k">✅ Aucun écart significatif — le bulletin semble conforme à nos calculs.</div>';
+    al+='<div class="al k">✅ Aucun écart significatif détecté.</div>';
   } else {
-    al=`<div class="al b">🚩 <b>${anomalies.length} écart(s) détecté(s)</b> :</div>`;
+    al+=`<div class="al b">🚩 <b>${anomalies.length} écart(s) détecté(s)</b> :</div>`;
     anomalies.forEach(r=>{
-      const fmt=(v,u)=>u==='€'?EUR(v):(v.toFixed(u==='repas'?0:2)+' '+(u==='repas'?'repas':u));
       const sens=r.diff>0?'bulletin SUPÉRIEUR':'bulletin INFÉRIEUR';
-      const ecart=fmt(Math.abs(r.diff),r.unit);
-      al+=`<div class="al b">🚩 <b>${esc(r.label)}</b> : ${sens} de <b>${ecart}</b>
-<br><span class="mut">Bulletin : ${fmt(r.bul,r.unit)} · Calculé : ${fmt(r.calc,r.unit)}${r.info?' · '+esc(r.info):''}</span></div>`;
+      al+=`<div class="al b">🚩 <b>${esc(r.label)}</b> : ${sens} de <b>${Math.abs(r.diff).toFixed(2)} ${r.unit}</b></div>`;
     });
-    al+=`<div class="al w" style="margin-top:6px">
-⚠️ Un écart peut venir d'un arrondi, d'un jour non saisi dans l'appli, ou d'une vraie erreur de l'employeur.<br>
-<b>Tolérance appliquée :</b> ±0,20h pour les durées, ±0,50€ pour les montants, ±0,01€/h pour les taux.
-</div>`;
   }
-
-  if(bul.ancienneteTxt){
-    const ancCalc=calcAnc(S.emb||DEF.emb);
-    const ok2=ancCalc.y===parseInt(bul.ancienneteTxt)||bul.ancienneteTxt.includes(ancCalc.y+' an');
-    al+=`<div class="al ${ok2?'i':'w'}">
-👤 Ancienneté bulletin : <b>${bul.ancienneteTxt}</b>
-— Calculée depuis le ${S.emb} : <b>${ancCalc.y} ans ${ancCalc.m} mois</b>
-(taux CCN auto : <b>${ancCalc.pct}%</b>)
-</div>`;
-  }
-
-  if(bul.rcAvant!=null&&bul.rcApres!=null){
-    al+=`<div class="al i">⏱️ RC bulletin : avant <b>${bul.rcAvant.toFixed(2)}h</b> → après <b>${bul.rcApres.toFixed(2)}h</b> (acquis ce mois : <b>${(bul.rcApres-bul.rcAvant).toFixed(2)}h</b>)</div>`;
-  }
-
-  if(bul.cpN){
-    al+=`<div class="al i">🏖️ CP année N — Acquis : <b>${bul.cpN.acquis}</b> · Pris : <b>${bul.cpN.pris}</b> · Solde : <b>${bul.cpN.solde}</b></div>`;
-  }
-
   $('bulAl').innerHTML=al;
-  $('bulOut').innerHTML='<div class="al k">✅ Bulletin analysé avec succès.</div>';
+  $('bulOut').innerHTML='<div class="al k">✅ Bulletin analysé sans corruption.</div>';
 }
 
 function renderBulHist(){
   if(!DB.bulletins||!DB.bulletins.length){
-    $('bulHist').innerHTML='<div class="al i">Aucun bulletin importé pour l\'instant.</div>';
+    $('bulHist').innerHTML='<div class="al i">Aucun bulletin importé.</div>';
     return;
   }
   let h='<table><tr><th>Mois</th><th class="n">Brut</th><th class="n">Net</th><th class="n">HS 25%</th><th class="n">HS 50%</th><th></th></tr>';
   DB.bulletins.forEach((b,i)=>{
     h+=`<tr>
-<td><a href="#" onclick="afficherBulletin(DB.bulletins[${i}]);$('bulResultCard').style.display='';return false" style="color:var(--blue)">${b.mois||'?'}</a></td>
+<td><a href="#" onclick="afficherBulletin(DB.bulletins[${i}]);return false" style="color:var(--blue)">${b.mois}</a></td>
 <td class="n">${b.brut?EUR(b.brut):'?'}</td>
 <td class="n">${b.net?EUR(b.net):'?'}</td>
 <td class="n">${b.hs25H!=null?b.hs25H.toFixed(2)+' h':'—'}</td>
@@ -1465,7 +1466,163 @@ function renderBulHist(){
 }
 
 /* ═══════════════════════════════════════════════
-   IMPORT PDF AMBUTRACK
+   PARSEUR ROMI1 OFFICIEL
+═══════════════════════════════════════════════ */
+function parseRomiFile(file){
+  const out=$('romOut');
+  if(!file)return;
+  const lib=window.pdfjsLib||window['pdfjs-dist/build/pdf'];
+  if(!lib){out.innerHTML='<div class="al b">❌ PDF.js non chargé.</div>';return}
+  if(!_wset){lib.GlobalWorkerOptions.workerSrc=PDF_WORKER;_wset=true;}
+  out.innerHTML='<div class="al i">⏳ Lecture du document ROMI1…</div>';
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    try{
+      const pdf=await lib.getDocument({data:new Uint8Array(e.target.result)}).promise;
+      let text='';
+      for(let p=1;p<=pdf.numPages;p++){
+        const pg=await pdf.getPage(p),ct=await pg.getTextContent();
+        let line='',py=null,px=null;
+        ct.items.forEach(it=>{
+          const x=it.transform[4],y=it.transform[5];
+          if(py!=null&&Math.abs(y-py)>2){text+=line+'\n';line=''}
+          else if(px!=null&&x-px>(it.height||10)*0.22)line+=' ';
+          line+=it.str;py=y;px=x+(it.width||0);
+        });
+        text+=line+'\n';
+      }
+      $('romTxt').value=text;
+      parseROMI();
+    }catch(err){out.innerHTML='<div class="al b">❌ Erreur lecture ROMI1 : '+esc(err.message)+'</div>';}
+  };
+  reader.readAsArrayBuffer(file);
+  $('from').value='';
+}
+
+function parseROMI(){
+  const raw=$('romTxt').value;
+  if(!raw.trim()){$('romOut').innerHTML='<div class="al w">Colle d\'abord le texte du relevé ROMI1.</div>';return}
+  const lines=raw.replace(/\u00a0/g,' ').replace(/\r/g,'\n').split('\n').map(l=>l.trim()).filter(l=>l);
+  const rom={};
+
+  function parseN(s){return parseFloat(String(s).replace(/\s/g,'').replace(',','.'))||0}
+
+  const moisMap={janvier:'01',fevrier:'02',février:'02',mars:'03',avril:'04',mai:'05',juin:'06',
+    juillet:'07',aout:'08',août:'08',septembre:'09',octobre:'10',novembre:'11',decembre:'12',décembre:'12'};
+  for(const l of lines){
+    const m=l.match(/(janvier|f[ée]vrier|mars|avril|mai|juin|juillet|ao[uû]t|septembre|octobre|novembre|d[ée]cembre)\s+(\d{4})/i);
+    if(m){
+      rom.mois=`${m[2]}-${moisMap[m[1].toLowerCase()]}`;
+      break;
+    }
+  }
+
+  for(const l of lines){
+    const mPer=l.match(/du\s+(\d{2}\/\d{2}\/\d{4})\s+au\s+(\d{2}\/\d{2}\/\d{4})/i);
+    if(mPer){rom.periodeDu=mPer[1];rom.periodeAu=mPer[2];break}
+  }
+
+  for(let i=0;i<lines.length;i++){
+    const l=lines[i];
+    if(/Heures\s+T\.?\s*T\.?\s*E\.?/i.test(l)){
+      const ns=l.match(/[\d]+[.,][\d]+/g);
+      if(ns&&ns.length)rom.tte=parseN(ns[0]);
+      else if(lines[i+1]){
+        const n2=lines[i+1].match(/[\d]+[.,][\d]+/g);
+        if(n2)rom.tte=parseN(n2[0]);
+      }
+    }
+    else if(/Heures\s+suppl[ée]mentaires/i.test(l)&&!/à\s*1/i.test(l)){
+      const ns=l.match(/[\d]+[.,][\d]+/g);
+      if(ns&&ns.length)rom.hsTotal=parseN(ns[0]);
+      else if(lines[i+1]){
+        const n2=lines[i+1].match(/[\d]+[.,][\d]+/g);
+        if(n2)rom.hsTotal=parseN(n2[0]);
+      }
+    }
+    else if(/suppl[ée]mentaires?\s*à\s*125%/i.test(l)){
+      const ns=l.match(/[\d]+[.,][\d]+/g);
+      if(ns&&ns.length>=2){rom.hs125Total=parseN(ns[0]);rom.hs125Payees=parseN(ns[1])}
+    }
+    else if(/suppl[ée]mentaires?\s*à\s*150%/i.test(l)){
+      const ns=l.match(/[\d]+[.,][\d]+/g);
+      if(ns&&ns.length)rom.hs150Total=parseN(ns[0]);
+    }
+    else if(/RC\s+cumul[eé].*base\s*100%/i.test(l)||/104,52\s+32,99/i.test(l)){
+      const ns=l.match(/[\d]+[.,][\d]+/g);
+      if(ns&&ns.length>=2){rom.rcInitial=parseN(ns[0]);rom.rcAcquis=parseN(ns[1])}
+    }
+    else if(/D[ée]p\.\s*d'amplitude/i.test(l)){
+      const ns=l.match(/[\d]+[.,][\d]+/g);
+      if(ns&&ns.length)rom.idaj=parseN(ns[0]);
+    }
+  }
+
+  rom.mois=normalizeMoisKey(rom.mois)||('2026-08');
+  const idx=DB.romis.findIndex(r=>r.mois===rom.mois);
+  if(idx>=0)DB.romis[idx]=rom;else DB.romis.push(rom);
+  DB.romis.sort((a,b)=>a.mois>b.mois?1:-1);
+  save();
+  afficherROMI(rom);
+  renderRomiHist();
+}
+
+function afficherROMI(rom){
+  $('romResultCard').style.display='';
+  $('romMois').textContent=rom.mois;
+  $('romKpi').innerHTML=[
+    ['Mois',rom.mois],
+    ['TTE Relevé',rom.tte?rom.tte.toFixed(2)+' h':'?'],
+    ['Total HS',rom.hsTotal?rom.hsTotal.toFixed(2)+' h':'?','warn'],
+    ['RC généré',rom.rcAcquis?rom.rcAcquis.toFixed(2)+' h':'?'],
+    ['Période',rom.periodeDu?`${rom.periodeDu} → ${rom.periodeAu}`:'Inconnue']
+  ].map(x=>`<div class="kpi ${x[2]||''}"><b>${x[1]}</b><span>${x[0]}</span></div>`).join('');
+
+  let t='<tr><th>Indicateur officiel ROMI1</th><th class="n">Valeur</th></tr>';
+  if(rom.tte)t+=`<tr><td>Heures T.T.E. constatées</td><td class="n">${rom.tte.toFixed(2)} h</td></tr>`;
+  if(rom.hsTotal)t+=`<tr><td>Total heures supplémentaires</td><td class="n">${rom.hsTotal.toFixed(2)} h</td></tr>`;
+  if(rom.hs125Total)t+=`<tr><td>HS 25% (base)</td><td class="n">${rom.hs125Total.toFixed(2)} h (dont ${rom.hs125Payees||0}h payées)</td></tr>`;
+  if(rom.hs150Total)t+=`<tr><td>HS 50% (base)</td><td class="n">${rom.hs150Total.toFixed(2)} h</td></tr>`;
+  if(rom.rcAcquis)t+=`<tr><td>RC acquis généré ce mois</td><td class="n">${rom.rcAcquis.toFixed(2)} h</td></tr>`;
+  if(rom.idaj)t+=`<tr><td>Dépassement amplitude (IDAJ)</td><td class="n">${rom.idaj.toFixed(2)} h</td></tr>`;
+  $('romTab').innerHTML=t;
+
+  const bul=DB.bulletins.find(b=>b.mois===rom.mois);
+  let al='';
+  if(bul){
+    const ecTTE=rom.tte-(bul.hNorm+(bul.hs25H||0)+(bul.hs50H||0));
+    al+=`<div class="al i">
+<b>Confrontation avec le bulletin ${rom.mois} :</b><br>
+HS payées au bulletin : <b>${(bul.hs25H||0).toFixed(2)} h</b> sur les <b>${(rom.hsTotal||0).toFixed(2)} h</b> réelles constatées par le relevé employeur.<br>
+Heures manquantes au paiement direct : <b>${((rom.hsTotal||0)-(bul.hs25H||0)).toFixed(2)} h</b> basculées en Repos Compensateur.
+</div>`;
+  }
+  $('romAl').innerHTML=al;
+  $('romOut').innerHTML='<div class="al k">✅ Relevé ROMI1 chargé avec succès.</div>';
+}
+
+function renderRomiHist(){
+  if(!DB.romis||!DB.romis.length){
+    $('romHist').innerHTML='<div class="al i">Aucun relevé ROMI1 enregistré.</div>';
+    return;
+  }
+  let h='<table><tr><th>Mois</th><th>Période</th><th class="n">TTE</th><th class="n">HS Totales</th><th class="n">RC Acquis</th><th></th></tr>';
+  DB.romis.forEach((r,i)=>{
+    h+=`<tr>
+<td><a href="#" onclick="afficherROMI(DB.romis[${i}]);return false" style="color:var(--blue)">${r.mois}</a></td>
+<td class="mut">${r.periodeDu||'—'} → ${r.periodeAu||'—'}</td>
+<td class="n">${r.tte?r.tte.toFixed(2)+' h':'—'}</td>
+<td class="n">${r.hsTotal?r.hsTotal.toFixed(2)+' h':'—'}</td>
+<td class="n">${r.rcAcquis?r.rcAcquis.toFixed(2)+' h':'—'}</td>
+<td><button class="r" style="padding:4px 8px;font-size:11px" onclick="DB.romis.splice(${i},1);save();renderRomiHist()">✕</button></td>
+</tr>`;
+  });
+  h+='</table>';
+  $('romHist').innerHTML=h;
+}
+
+/* ═══════════════════════════════════════════════
+   IMPORT AMBUTRACK PDF & EXCEL
 ═══════════════════════════════════════════════ */
 const RX_PER=/P[ée]riode du (\d{1,2})\/(\d{1,2})\/(\d{4}) au (\d{1,2})\/(\d{1,2})\/(\d{4})/gi;
 const RX_DAY=/(\d{1,2}) (Lun|Mar|Mer|Jeu|Ven|Sam|Dim) ((?:(?!\d{1,2} (?:Lun|Mar|Mer|Jeu|Ven|Sam|Dim) |Semaine \d|Total quatorzaine|DATE TYPE|Avertissement|P[ée]riode du).)*)/g;
@@ -1494,11 +1651,9 @@ function parsePdfFile(file){
         });
         text+=line+'\n';
       }
-      if(!text.trim()){out.innerHTML='<div class="al b">❌ Aucun texte extrait.</div>';return}
       $('impTxt').value=text;parsePDF();
     }catch(err){out.innerHTML='<div class="al b">❌ '+esc(err.message)+'</div>';}
   };
-  reader.onerror=()=>{out.innerHTML='<div class="al b">❌ Fichier illisible.</div>'};
   reader.readAsArrayBuffer(file);$('fpdf').value='';
 }
 
@@ -1510,29 +1665,26 @@ function parsePDF(){
   const marks=[...t.matchAll(RX_PER)];
   if(!marks.length){out.innerHTML='<div class="al b">❌ Ligne « Période du … au … » introuvable.</div>';return}
   pushUndo('Import PDF AmbuTrack');
-  let html='',tot=0,allFer=[];
+  let html='',tot=0;
   marks.forEach((m,i)=>{
     const blk=t.slice(m.index,i+1<marks.length?marks[i+1].index:t.length);
     const st=m[3]+'-'+pad(+m[2])+'-'+pad(+m[1]),en=m[6]+'-'+pad(+m[5])+'-'+pad(+m[4]);
-    const R=parseBlock(blk,st,en);tot+=R.n;R.fer.forEach(k=>allFer.push(k));
+    const R=parseBlock(blk,st,en);tot+=R.n;
     html+=`<div class="al ${R.n?'k':'b'}"><b>${shortY(st)} → ${shortY(en)}</b> — ${R.n} journées</div>`;
-    if(R.warn.length)html+='<div class="al w">⚠️ '+R.warn.join(' · ')+'</div>';
   });
   save();
-  out.innerHTML=`<div class="al k"><b>✅ ${tot} journées importées</b></div>`+html
-    +(allFer.length?'<div class="al w">☀️ Fériés : '+allFer.map(shortY).join(', ')+'</div>':'');
+  out.innerHTML=`<div class="al k"><b>✅ ${tot} journées importées</b></div>`+html;
   if(tot){curDate=marks[0][3]+'-'+pad(+marks[0][2])+'-'+pad(+marks[0][1]);curMonth=curDate.slice(0,7)}
   renderAll();
 }
+
 function parseBlock(b,st,en){
-  const S=DB.s,pd=P(S.panDeb),pf=P(S.panFin);
   RX_DAY.lastIndex=0;const rows=[...b.matchAll(RX_DAY)];
-  const rep={T:0,REPOS:0,RC:0,CP:0,MAL:0},fer=[],warn=[];
   let cur=st,n=0;
   rows.forEach(r=>{
     const dn=+r[1];let g=0;
     while(+cur.slice(8)!==dn&&g<45){cur=addD(cur,1);g++}
-    if(g>=45){warn.push('jour '+dn+' non replacé');return}
+    if(g>=45)return;
     const k=cur,txt=r[3];cur=addD(cur,1);
     let ty='REPOS';
     if(/REPOS ?COMP/i.test(txt))ty='RC';
@@ -1542,12 +1694,12 @@ function parseBlock(b,st,en){
     const d={t:ty,p:[]};
     if(ty==='T'){
       RX_HOR.lastIndex=0;const hh=txt.match(RX_HOR);
-      if(hh){d.deb=hh[1];d.fin=hh[2]}else warn.push(short(k)+' horaires illisibles');
-      const a=P(d.deb),z=P(d.fin);RX_PZ.lastIndex=0;
+      if(hh){d.deb=hh[1];d.fin=hh[2]}
+      RX_PZ.lastIndex=0;
       [...txt.matchAll(RX_PZ)].forEach(p=>d.p.push({d:p[1],f:p[2],ty:p[3]}));
-      if(isFerie(k)){d.fer=true;fer.push(k)}
+      if(isFerie(k))d.fer=true;
     }
-    rep[ty]++;DB.days[k]=d;n++;
+    DB.days[k]=d;n++;
   });
   if(n){
     const days=nDays(st,en)+1,nb=Math.max(1,Math.round(days/14));
@@ -1555,77 +1707,7 @@ function parseBlock(b,st,en){
     if(ex)ex.nb=nb;else DB.periods.push({start:st,nb});
     DB.periods.sort((a,b)=>a.start<b.start?-1:1);gb(st);DB.per={start:st,nb};
   }
-  return{n,rep,fer,warn};
-}
-
-function excelDate(v){
-  if(v==null||v==='')return null;
-  if(v instanceof Date)return isoOf(v);
-  if(typeof v==='number')return isoOf(new Date(Math.round((v-25569)*86400*1000)));
-  const s=String(v).trim();
-  let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);if(m)return m[1]+'-'+pad(+m[2])+'-'+pad(+m[3]);
-  m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);if(m)return m[3]+'-'+pad(+m[2])+'-'+pad(+m[1]);
-  return null;
-}
-function parseExcel(file){
-  const out=$('impOut');if(!file)return;
-  if(typeof XLSX==='undefined'){out.innerHTML='<div class="al b">❌ XLSX non chargé.</div>';return}
-  const reader=new FileReader();
-  reader.onload=function(e){
-    let wb;
-    try{wb=XLSX.read(e.target.result,{type:'array',cellDates:true})}
-    catch(err){out.innerHTML='<div class="al b">❌ Fichier Excel invalide.</div>';return}
-    const wsName=wb.SheetNames.includes('Gardes')?'Gardes':wb.SheetNames[0];
-    const rows=XLSX.utils.sheet_to_json(wb.Sheets[wsName],{defval:''});
-    if(!rows.length){out.innerHTML='<div class="al b">❌ Aucune ligne.</div>';return}
-    const S=DB.s,pdMin=P(S.panDeb),pfMin=P(S.panFin);
-    const rep={T:0,REPOS:0,RC:0,CP:0,MAL:0},fer=[],warnNuit=[],warnH=[],dates=[];
-    let iru=0,n=0;
-    pushUndo('Import Excel');
-    rows.forEach(row=>{
-      const k=excelDate(row['Date']);if(!k)return;
-      const type=String(row['Type']||'').trim();if(!type)return;
-      let ty='REPOS';
-      if(/travail/i.test(type))ty='T';
-      else if(/repos ?comp/i.test(type))ty='RC';
-      else if(/repos/i.test(type))ty='REPOS';
-      else if(/cong[eé]/i.test(type))ty='CP';
-      else if(/malad|accid|\bAT\b/i.test(type))ty='MAL';
-      else return;
-      const d={t:ty,p:[]};
-      if(ty==='T'){
-        const nuit=String(row['Nuit']||'').trim();
-        const deb=String(row['Début']||'').trim(),fin=String(row['Fin']||'').trim();
-        if(nuit&&deb==='00:00'&&fin==='00:00'){warnNuit.push(k);return}
-        if(!/^\d{1,2}:\d{2}$/.test(deb)||!/^\d{1,2}:\d{2}$/.test(fin)){warnH.push(k);return}
-        d.deb=deb;d.fin=fin;
-        const sa=P(deb);let sb=P(fin);if(sb<=sa)sb+=1440;
-        const panOK=sa<=pdMin&&sb>=pfMin;
-        const pz=String(row['Pauses']||'').trim();
-        if(pz&&pz!=='-'){
-          const pm=pz.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):?(\d{2})$/);
-          if(pm){const pS=pad(+pm[1])+':'+pm[2],pE=pad(+pm[3])+':'+pm[4];
-            d.p.push({d:pS,f:pE,ty:'ENT'});if(panOK)iru++;}
-        }
-        if(isFerie(k)){d.fer=true;fer.push(k)}
-      }
-      const note=String(row['Note']||'').trim();if(note)d.note=note;
-      DB.days[k]=d;rep[ty]++;n++;dates.push(k);
-    });
-    if(!n){out.innerHTML='<div class="al b">❌ Aucune journée exploitable.</div>';return}
-    dates.sort();const first=dates[0],last=dates[dates.length-1];
-    let qs=addD(S.anchor,Math.floor(nDays(S.anchor,first)/14)*14),nbPer=0;
-    while(qs<=last){if(!DB.periods.some(p=>p.start===qs)){DB.periods.push({start:qs,nb:1});nbPer++}gb(qs);qs=addD(qs,14);}
-    DB.periods.sort((a,b)=>a.start<b.start?-1:1);
-    DB.per={start:DB.periods[DB.periods.length-1].start,nb:1};save();
-    out.innerHTML=`<div class="al k"><b>✅ ${n} journées importées</b> du ${shortY(first)} au ${shortY(last)}</div>`
-      +(iru?`<div class="al w">🍽️ ${iru} pauses → IRU par défaut. Corrige si repas dehors.</div>`:'')
-      +(fer.length?'<div class="al w">☀️ Fériés : '+fer.map(shortY).join(', ')+'</div>':'')
-      +(warnNuit.length?'<div class="al b">🌙 '+warnNuit.length+' nuit(s) 00:00-00:00 à corriger manuellement.</div>':'')
-      +(warnH.length?'<div class="al w">⚠️ Horaires illisibles : '+warnH.map(shortY).join(', ')+'</div>':'');
-    curDate=last;curMonth=last.slice(0,7);renderAll();
-  };
-  reader.readAsArrayBuffer(file);$('fx').value='';
+  return{n};
 }
 
 function expo(){
@@ -1643,27 +1725,28 @@ function impo(i){
       if(!j.days)throw new Error('Pas de données journalières');
       pushUndo('Import JSON');
       DB={...DB,...j};DB.s={...DEF,...(j.s||{})};
-      DB.periods=j.periods||[];DB.bul=j.bul||{};DB.bulletins=j.bulletins||[];
-      save();renderAll();alert('✅ Import réussi');
+      DB.periods=j.periods||[];DB.bul=j.bul||{};
+      DB.bulletins=j.bulletins||[];DB.romis=j.romis||[];
+      normalizeBulletinKeys();
+      save();renderAll();alert('✅ Données restaurées');
     }catch(x){alert('Fichier illisible : '+x.message)}
   };
   r.readAsText(f);i.value='';
 }
 function wipe(){
-  if(confirm('⚠️ Effacer TOUTES les données ?\nExportez d\'abord vos données !')){
+  if(confirm('⚠️ Effacer TOUTES les données ? Exportez d\'abord votre JSON !')){
     localStorage.removeItem(LS);location.reload();
   }
 }
 function copySum(){
   const{Q,G}=calcPer(DB.per.start,DB.per.nb);
-  let t='MesHeures — Résumé\n';
+  let t='MesHeures — Synthèse\n';
   t+='Période : '+short(DB.per.start)+' → '+short(addD(DB.per.start,DB.per.nb*14-1))+'\n\n';
   Q.forEach((o,i)=>{
-    o.w.forEach((s,j)=>t+='Sem. '+(j+1)+' ('+short(s.start)+') : Amp '+F(s.amp)+' · TTE '+F(s.tte)+'\n');
-    t+='→ Q'+(i+1)+' : TTE '+F(o.seuil)+' | HS 25% '+F(o.h25)+' · HS 50% '+F(o.h50)+'\n\n';
+    t+='→ Quatorzaine '+(i+1)+' : TTE '+F(o.seuil)+' | HS 25% '+F(o.h25)+' · HS 50% '+F(o.h50)+'\n';
   });
-  t+='TOTAL : TTE '+F(G.tte)+' · Amp '+F(G.amp)+' · '+G.trav+' j · '+(G.ir+G.iru)+' paniers · IDAJ '+C2(G.idaj)+'h';
-  navigator.clipboard.writeText(t).then(()=>alert('✅ Résumé copié !'),()=>prompt('Copie :',t));
+  t+='\nTOTAL : TTE '+F(G.tte)+' · Amplitude '+F(G.amp)+' · '+G.trav+' j · Paniers: '+(G.ir+G.iru);
+  navigator.clipboard.writeText(t).then(()=>alert('✅ Synthèse copiée !'),()=>prompt('Copie :',t));
 }
 
 load();
